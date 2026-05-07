@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>量化因子挖掘与策略研发技术报告</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #FAFAFA; --text: #1A1A1A; --muted: #555; --divider: #DDD; --accent: #2a7d2a;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.8; }
+
+    /* 导航栏 */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(250,250,250,0.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--divider); padding: 0.7rem 0; }
+    nav .nav-inner { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; display: flex; gap: 1.2rem; flex-wrap: wrap; }
+    nav a { font-size: 0.8rem; font-weight: 500; text-decoration: none; color: var(--muted); transition: color 0.2s; white-space: nowrap; }
+    nav a:hover { color: var(--text); }
+
+    /* 主体 */
+    .container { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+
+    h1 { font-size: 1.7rem; font-weight: 800; margin-bottom: 0.4rem; letter-spacing: -0.02em; }
+    h2 { font-size: 1.25rem; font-weight: 700; margin-top: 2.8rem; margin-bottom: 1rem; border-bottom: 1px solid var(--divider); padding-bottom: 0.4rem; }
+    h3 { font-size: 1.05rem; font-weight: 600; margin-top: 1.6rem; margin-bottom: 0.6rem; }
+    p { margin-bottom: 1rem; }
+    .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 2rem; }
+    ul, ol { margin: 0.8rem 0 1rem 1.5rem; }
+    li { margin-bottom: 0.3rem; }
+    table { width: 100%; border-collapse: collapse; margin: 1.2rem 0 1.8rem; font-size: 0.85rem; }
+    th, td { border: 1px solid var(--divider); padding: 0.5rem 0.7rem; text-align: left; }
+    th { background: #f0f0f0; font-weight: 600; }
+    .metric { color: var(--accent); font-weight: 600; }
+    .formula { background: #f5f5f5; padding: 0.8rem 1.2rem; border-left: 3px solid #888; margin: 1rem 0; font-family: 'Courier New', monospace; font-size: 0.85rem; overflow-x: auto; }
+    .note { background: #fff8e1; border-left: 3px solid #f0c040; padding: 0.7rem 1rem; margin: 1rem 0; font-size: 0.9rem; color: #6b5a00; }
+    .img-placeholder { display: block; width: 100%; max-width: 700px; margin: 1.5rem auto; border: 2px dashed var(--divider); border-radius: 6px; padding: 1rem; text-align: center; color: var(--muted); font-size: 0.85rem; background: #fff; }
+    .img-placeholder img { max-width: 100%; height: auto; }
+    .back-to-top { text-align: right; margin-top: 1rem; }
+    .back-to-top a { font-size: 0.8rem; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--divider); }
+    .back-to-top a:hover { color: var(--text); }
+    .end-mark { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 2.5rem; }
+
+    @media (max-width: 600px) {
+      nav .nav-inner { gap: 0.6rem; }
+      nav a { font-size: 0.72rem; }
+      h1 { font-size: 1.4rem; }
+      .container { padding-top: 4rem; }
+    }
+    @media print { nav { display: none; } body { padding: 0; } .container { padding-top: 1rem; max-width: 100%; } }
+  </style>
+</head>
+<body>
+
+<!-- ===== 导航栏 ===== -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#overview">概述</a>
+    <a href="#pipeline">研发管线</a>
+    <a href="#frameworks">建模框架</a>
+    <a href="#results">关键成果</a>
+    <a href="#engineering">工程实践</a>
+    <a href="#summary">总结</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- ===== 1. 概述 ===== -->
+<h1 id="overview">量化因子挖掘与策略研发技术报告</h1>
+<p class="subtitle">加密货币截面多空因子 · 建模框架 · 工程实践记录</p>
+
+<p>本报告记录了我在加密货币量化策略研发领域的系统性工作，核心涵盖<strong>策略研发管线搭建、多套建模框架实现、因子显著性评估体系构建，以及一系列工程实践问题的排查与解决</strong>。</p>
+<p>报告重点展示三方面能力：</p>
+<p><strong>建模框架多样性</strong>——从LightGBM截面多目标回归、单标的时间序列预测，到基于遗传规划的非线性因子挖掘，三套框架覆盖了量化因子研发的主要技术路线。</p>
+<p><strong>因子评估严谨性</strong>——建立了包含Rank IC/IR、Quantile Spread、回归分析、相关性矩阵在内的完整评估体系，确保每个因子的有效性可量化、可对比。</p>
+<p><strong>工程落地能力</strong>——从数据清洗、特征工程、中性化处理到回测引擎和实盘部署，独立走通了从研究到生产的全链路。在实盘与回测出现偏差时，深入到订单簿（Order Book）级别进行微观结构分析，积累了宝贵的实践经验。</p>
+
+<div class="back-to-top"><a href="#nav">↑ 返回顶部</a></div>
+
+<!-- ===== 2. 策略研发管线 ===== -->
+<h2 id="pipeline">2. 策略研发管线</h2>
+<p>整套策略研发管线包含以下核心环节，每个环节均有独立的模块实现和验证流程：</p>
+
+<h3>2.1 数据处理与清洗</h3>
+<p>原始数据源为Binance交易所分钟级OHLCV数据，覆盖50个主流加密货币永续合约，时间跨度超过两年。数据处理环节解决的问题包括：</p>
+<ul>
+  <li><strong>数据异常检测与修复</strong>：发现并处理了Binance历史数据在特定时间段（如2022年5月）出现的价格不变、成交量为零的异常情况，采用API直采数据替代本地缓存数据。</li>
+  <li><strong>数据对齐与填充</strong>：不同资产上线时间不同，通过前向填充和共同时间戳对齐，确保截面数据的完整性。</li>
+  <li><strong>收益率标签计算</strong>：支持多时间尺度（1min/5min/10min/20min/60min）的前瞻收益率计算，并处理了调仓频率与收益率时间跨度不匹配的问题。</li>
+</ul>
+
+<h3>2.2 特征工程</h3>
+<p>构建了包含技术指标、动量因子、波动率因子、买卖压力指标等类别的特征库。特征数量从最初的几个逐步扩展到数十个，并通过以下方式持续优化：</p>
+<ul>
+  <li>使用Ta-Lib库实现标准化因子计算，后续发现EMA函数因输入长度不同导致结果不一致的bug，改用SMA自实现替代（详见5.1节）。</li>
+  <li>引入不同时间窗口的参数变体（如momentum_5min、momentum_20min等），丰富特征维度。</li>
+  <li>通过特征相关性分析和重要性评估，筛选冗余特征，控制模型输入维度。</li>
+</ul>
+
+<h3>2.3 中性化处理</h3>
+<p>针对截面多空策略的特点，实现了多种中性化方案：</p>
+<ul>
+  <li><strong>市场中性化（Beta Adjustment）</strong>：对特征和标签分别减去市场收益（截面中位数）乘以各资产的Beta系数，消除市场整体波动对因子信号的干扰。</li>
+  <li><strong>特征去均值/去中位数</strong>：对截面特征逐时间点减去均值或中位数，确保因子信号反映的是相对强弱而非绝对水平。</li>
+  <li><strong>选择性中性化</strong>：区分适合中性化的特征（波动率类、趋势强度类）和不适合中性化的特征（超买超卖类如RSI、MFI）。</li>
+</ul>
+
+<h3>2.4 模型训练与调优</h3>
+<p>模型训练采用滚动窗口或固定训练集的方式，严格区分样本内和样本外数据。调优手段包括：</p>
+<ul>
+  <li>网格搜索、随机搜索和贝叶斯优化三种超参调优方法。</li>
+  <li>自定义损失函数（如Dual Quantile Loss），将MAE的梯度与MSE的Hessian结合，在60分钟预测周期上取得了显著优于标准损失函数的效果（详见4.2节）。</li>
+  <li>添加换手率惩罚项，控制因子ACF（自相关系数），降低调仓频率和交易成本。</li>
+  <li>通过Loss Curve监控训练过程，识别过拟合和欠拟合问题。</li>
+</ul>
+
+<h3>2.5 因子评估体系</h3>
+<p>建立了一套完整的因子评估指标体系，从多个维度综合评价因子质量：</p>
+<ul>
+  <li><strong>Rank IC / Rank IR</strong>：衡量因子预测值与未来收益率排序的一致性，IR超过2.0即表明因子具有稳定的预测能力。</li>
+  <li><strong>Quantile Spread</strong>：计算高分位与低分位组合的收益差，反映因子对截面收益的区分度。</li>
+  <li><strong>回归分析</strong>：对因子预测值与实际收益率做截面回归，关注Slope的显著性和T-stat是否大于2。</li>
+  <li><strong>因子ACF</strong>：衡量因子自身的时间序列相关性，ACF过高意味着换手率低但可能出现信号延迟，ACF过低意味着换手率过高、交易成本大。</li>
+  <li><strong>因子相关性矩阵</strong>：评估多个因子之间的信息冗余度，为因子组合提供依据。</li>
+</ul>
+<p>此外，还实现了回测资金曲线（PNL Curve）的可视化，通过多份资金复利合并的方式准确计算最大回撤和Sharpe比率。</p>
+
+<div class="back-to-top"><a href="#nav">↑ 返回顶部</a></div>
+
+<!-- ===== 3. 建模框架 ===== -->
+<h2 id="frameworks">3. 建模框架</h2>
+<p>为了系统性地挖掘加密货币市场的Alpha因子，我搭建了三套互补的建模框架，分别从不同角度捕捉市场信号：</p>
+<ul>
+  <li><strong>截面多目标回归模型</strong>（核心框架）：一次预测数十个资产的截面排序，捕捉资产间的相对强弱关系，适合高频调仓。</li>
+  <li><strong>单标的时间序列模型</strong>（辅助框架）：为每个资产独立建模，不受其他资产数据质量干扰，适合快速验证单因子有效性。</li>
+  <li><strong>遗传规划因子挖掘</strong>（探索性框架）：自动发现非线性因子表达式，突破人工设计的思维限制，持续为前两个框架提供候选因子。</li>
+</ul>
+<p>三套框架并行运行，互相补充。截面模型是策略的核心引擎，时序模型提供独立验证视角，遗传规划则不断扩展因子库的边界。</p>
+
+<h3>3.1 截面多目标回归模型</h3>
+<p><strong>技术路线</strong>：LightGBM多目标回归，将N个资产×M个特征展平为输入，同时预测所有资产的截面收益率排序。</p>
+<p><strong>关键特点</strong>：能够学习资产间的相对关系；特征数量×资产数量导致输入维度较高（如48资产×9特征=432维），对特征选择要求更高。</p>
+<p><strong>代表性成果</strong>：通过特征中性化、标准化和换手率惩罚，在50个资产的截面上实现样本外Rank IR 3.0+，Quantile Spread稳定为正。详见4.1节评估指标。</p>
+
+<h3>3.2 单标的时间序列模型</h3>
+<p><strong>技术路线</strong>：LightGBM单目标回归，为每个资产独立训练一个模型，使用该资产的历史特征预测未来收益率。</p>
+<p><strong>关键特点</strong>：简单直接，适合快速验证因子有效性；不受其他资产数据质量影响；训练速度快，适合大规模因子筛选。</p>
+<p><strong>代表性成果</strong>：使用复合动量因子训练的5分钟预测模型，在样本外Rank IR达到2.5以上。</p>
+
+<h3>3.3 遗传规划因子挖掘</h3>
+<p><strong>技术路线</strong>：使用PyGAD遗传算法库，以非线性方式组合基础因子，自动搜索具有预测能力的因子表达式。支持自定义操作库（数学运算、逻辑条件、非线性变换、技术指标等）和适应度函数（MSE、Rank IC等）。</p>
+<p><strong>关键特点</strong>：不需要梯度回传，可以使用Rank IC等不可导指标作为适应度函数；能够发现传统线性框架无法捕捉的非线性关系；种群机制天然支持批量挖掘多个因子。</p>
+<p><strong>代表性成果</strong>：挖掘出多个具有显著预测能力的非线性因子，部分因子在60分钟预测周期上表现优异。以下是两个典型的遗传规划挖掘出的因子公式：</p>
+
+<div class="formula">
+<strong>5分钟预测因子（基于威廉指标和VWAP）：</strong><br>
+(williams_r_factor-0-56 × 0.6914) × -0.000205 + (log(vwap-0-40) × 0.2465) × -0.000235
+</div>
+
+<div class="formula">
+<strong>60分钟预测因子（使用tanh非线性变换）：</strong><br>
+(wap-0-10 × 0.0840) × 0.001188 + (tanh(wap-0-30 × -0.5716)) × 0.000192
+</div>
+
+<p>这些公式展示了遗传规划的优势：能够自动组合多个因子、应用非线性变换（log、tanh、sigmoid等），并优化权重参数。人工设计很难同时探索如此广阔的组合空间，而遗传规划可以在无人干预的情况下持续运行，不断产出新的候选因子。</p>
+
+<div class="back-to-top"><a href="#nav">↑ 返回顶部</a></div>
+
+<!-- ===== 4. 关键成果展示 ===== -->
+<h2 id="results">4. 关键成果展示</h2>
+
+<h3>4.1 截面多空策略评估指标</h3>
+<p>下表展示了LightGBM多目标回归模型在50个加密货币截面上的完整评估指标，样本内（2022.03-2023.02）与样本外（2023.06-2023.12）对比：</p>
+<table>
+  <tr><th>指标</th><th>样本内</th><th>样本外</th></tr>
+  <tr><td>Quantile Spread Mean</td><td>0.000238</td><td>0.000107</td></tr>
+  <tr><td>Quantile Spread Std</td><td>0.001303</td><td>0.000956</td></tr>
+  <tr><td>Rank IC Median</td><td>0.0647</td><td>0.0387</td></tr>
+  <tr><td>Rank IC Std</td><td>0.1670</td><td>0.1603</td></tr>
+  <tr><td class="metric">Rank IR (daily)</td><td class="metric">6.57</td><td class="metric">3.02</td></tr>
+  <tr><td>Regression Slope T-stat</td><td>72.9</td><td>31.0</td></tr>
+  <tr><td>Factor ACF (lag=1)</td><td>0.095</td><td>0.127</td></tr>
+</table>
+<p>样本外Rank IR达到3.0以上，表明因子在样本外仍具有显著的预测能力。Regression Slope T-stat远超2.0的显著性阈值，因子与未来收益率之间存在统计上显著的正相关关系。</p>
+
+<div class="img-placeholder">
+  <p><strong>📌 图1：回测PNL曲线图</strong></p>
+  <p><!-- 替换为：<img src="pictures/report/backtest_pnl.png" alt="回测PNL曲线"> --></p>
+</div>
+
+<h3>4.2 多时间尺度预测能力</h3>
+<p>同一建模框架在不同预测周期上的表现对比，展示了策略在短周期（5分钟）到长周期（60分钟）上的适应能力：</p>
+<table>
+  <tr><th>预测周期</th><th>Quantile Spread Mean</th><th>Rank IR (daily)</th></tr>
+  <tr><td>5分钟</td><td>0.000207</td><td class="metric">7.14</td></tr>
+  <tr><td>10分钟</td><td>0.000171</td><td>6.05</td></tr>
+  <tr><td>20分钟</td><td>0.000157</td><td>4.45</td></tr>
+  <tr><td class="metric">60分钟</td><td class="metric">0.000468</td><td>1.95</td></tr>
+</table>
+<p>值得关注的是，60分钟周期的Quantile Spread远高于短周期（因为单次收益更大），但Rank IR相对较低（因为样本量小、信号稀疏）。针对60分钟周期，我专门设计了Dual Quantile Loss来优化模型训练，效果显著。</p>
+
+<div class="note">
+<strong>Dual Quantile Loss</strong>：将MAE的梯度与MSE的Hessian结合的一种自定义损失函数。在GBM框架中，该损失函数对60分钟预测产生了超出预期的好效果——这是通过系统性实验发现的成果。MAE的梯度决定了损失下降的方向（对异常值不敏感、更稳健），MSE的Hessian决定了步长（对误差大的样本施加更大的修正力度），两者的结合在长周期预测中取得了比单独使用任何一种损失函数都更好的效果。
+</div>
+
+<h3>4.3 因子相关性分析</h3>
+<p>遗传规划挖掘出的多个因子之间的相关系数矩阵（截取前6个模型），低相关性意味着因子间信息互补，组合后有望提升整体策略表现：</p>
+<table>
+  <tr><th>模型</th><th>GA_0458</th><th>GA_314b</th><th>GA_3f2b</th><th>GA_51e9</th><th>GA_6b59</th><th>GA_c1d9</th></tr>
+  <tr><td>GA_0458</td><td class="metric">1.00</td><td>0.07</td><td>0.11</td><td>0.20</td><td>0.42</td><td>0.21</td></tr>
+  <tr><td>GA_314b</td><td>0.07</td><td class="metric">1.00</td><td>0.20</td><td>-0.09</td><td>-0.19</td><td>-0.26</td></tr>
+  <tr><td>GA_3f2b</td><td>0.11</td><td>0.20</td><td class="metric">1.00</td><td>0.77</td><td>0.77</td><td>0.27</td></tr>
+  <tr><td>GA_51e9</td><td>0.20</td><td>-0.09</td><td>0.77</td><td class="metric">1.00</td><td>0.67</td><td>0.20</td></tr>
+  <tr><td>GA_6b59</td><td>0.42</td><td>-0.19</td><td>0.77</td><td>0.67</td><td class="metric">1.00</td><td>0.25</td></tr>
+  <tr><td>GA_c1d9</td><td>0.21</td><td>-0.26</td><td>0.27</td><td>0.20</td><td>0.25</td><td class="metric">1.00</td></tr>
+</table>
+<p>可以看到，GA_314b与其他所有模型均呈现负相关或极低正相关，而GA_3f2b与GA_51e9、GA_6b59之间存在较高相关性（0.77）。这种分析为因子组合的权重分配提供了量化依据——高相关性的因子不需要重复加入组合，低相关性的因子组合在一起更有可能提升整体策略的稳定性和收益率。</p>
+
+<div class="img-placeholder">
+  <p><strong>📌 图2：因子相关性热力图</strong></p>
+  <p><!-- 替换为：<img src="pictures/report/factor_correlation_matrix.png" alt="因子相关性热力图"> --></p>
+</div>
+
+<div class="img-placeholder">
+  <p><strong>📌 图3：所有因子的显著性表现汇总表</strong></p>
+  <p><!-- 替换为：<img src="pictures/report/factor_significance_summary.png" alt="因子显著性汇总表"> --></p>
+</div>
+
+<div class="img-placeholder">
+  <p><strong>📌 图4：Quantile Spread时序图</strong></p>
+  <p><!-- 替换为：<img src="pictures/report/quantile_spread_time_series.png" alt="Quantile Spread时序图"> --></p>
+</div>
+
+<div class="back-to-top"><a href="#nav">↑ 返回顶部</a></div>
+
+<!-- ===== 5. 工程实践经验 ===== -->
+<h2 id="engineering">5. 工程实践经验</h2>
+<p>在策略研发过程中，遇到并解决了若干具有代表性的技术问题。这些经验体现了独立排查和解决复杂工程问题的能力，也是策略从研究走向实盘过程中不可或缺的积累。</p>
+
+<h3>5.1 修复Ta-Lib中EMA函数的深层Bug</h3>
+<p><strong>问题</strong>：生产环境和本地环境运行同一模型，因子值存在微小差异，导致backtest与live forecast对不上。</p>
+<p><strong>排查</strong>：通过逐层对比feature数据，发现使用了EMA计算的技术指标（如RSI、MACD）在不同时间序列长度下会产生不同结果。EMA的递归计算依赖初始值，而Ta-Lib的实现在不同输入长度下采用了不同的初始化策略。这不是配置问题，而是库本身的实现不一致。</p>
+<p><strong>解决</strong>：将RSI、MACD等依赖EMA的指标改用SMA（简单移动平均）自实现替代，确保在任何输入长度下结果完全一致。这一修改被集成到production代码中，彻底解决了长期存在的对齐问题。</p>
+
+<h3>5.2 排查"标准化引入未来数据"的隐蔽问题</h3>
+<p><strong>问题</strong>：backtest中发现某些模型样本内表现异常好，但样本外骤降，怀疑存在数据泄露。</p>
+<p><strong>排查</strong>：检查发现，特征标准化使用了全数据集（包括测试集）的均值和标准差——模型在训练时已经"看到"了测试数据的统计特征，属于隐蔽的未来数据引入。这个问题在初始数据探索阶段不易被发现，因为因子评估指标（IC、IR）看起来正常，只有到实盘时才会暴露。</p>
+<p><strong>解决</strong>：改用固定标准化（仅使用训练集的统计量）。经对比测试，固定标准化在回测稳定性和计算效率上均优于滚动标准化，最终被采用为production标准。</p>
+
+<h3>5.3 数据异常检测与处理</h3>
+<p><strong>问题</strong>：回测中某些时间点IC值为NaN，追查发现所有资产收益率均为零。</p>
+<p><strong>排查</strong>：通过可视化数据分布，定位到Binance历史数据中两个异常时间段（2022年5月1日和5月28日的若干分钟），所有资产OHLC价格为常数、成交量为零。</p>
+<p><strong>解决</strong>：对比ZIP包下载数据和API直采数据，发现API直采数据不受此问题影响。改用API数据替代ZIP包数据，同时在数据处理管线中添加了异常时间戳自动检测和过滤机制。</p>
+
+<h3>5.4 调仓频率与收益率计算的时间对齐</h3>
+<p><strong>问题</strong>：回测资金曲线的计算中，调仓频率（如5分钟）与收益率时间跨度不匹配时，复利计算出现偏差。</p>
+<p><strong>解决</strong>：重新设计了drawdown计算流程——当预测周期为N分钟时，将初始资金分成N份，前N分钟依次入金，之后每份资金按N分钟的间隔独立调仓，最后合并N份资金曲线取均值。这种方式更准确地模拟了实盘调仓的实际情况，消除了因计算方式导致的回测曲线失真。</p>
+
+<h3>5.5 因子数量对输出稳定性的影响</h3>
+<p><strong>问题</strong>：在LightGBM截面模型中，发现因子标准差（Factor Std）随输入维度的变化而剧烈震荡——某些维度下正常（~0.00007），另一些维度下骤降一个数量级（~0.000004），导致因子失去区分度。</p>
+<p><strong>排查</strong>：通过控制变量实验，发现该现象与特征数量和资产数量的组合有关。当删除或新增某个特征时，即使模型超参不变，Factor Std也会发生突变，说明LightGBM在特定输入维度下存在参数不匹配。</p>
+<p><strong>解决</strong>：通过标准化训练标签（将label std normalize到1再训练，预测后再reverse），有效消除了Factor Std的震荡，使不同特征组合下模型的输出稳定性大幅提升。</p>
+
+<h3>5.6 回测与实盘的偏差：摩擦成本与流动性的挑战</h3>
+<p><strong>问题</strong>：策略部署到实盘后，回测曲线与实盘净值之间存在系统性偏差——回测显示稳定盈利，实盘却出现持续的滑点损耗。</p>
+<p><strong>排查</strong>：通过对比Backtest Position（回测信号产生的目标仓位）、Target Position（策略引擎输出的目标仓位）和Actual Position（实际成交仓位），发现偏差主要来自两个层面：</p>
+<ol>
+  <li><strong>执行层面</strong>：maker挂单未成交（方向做对的单子吃不到），taker成交造成额外成本。方向做对的单子往往因为价格朝不利方向移动而无法在maker端成交，而方向做错的单子因为价格朝有利方向移动反而更容易成交——这种不对称性是回测系统无法模拟的。</li>
+  <li><strong>市场微观结构</strong>：加密货币市场的流动性分布与传统期货市场有本质差异，部分小币种挂单深度不足，导致大额调仓时产生显著滑点。</li>
+</ol>
+<p><strong>核心认知</strong>：传统期货市场的回测框架假设"有信号就能成交"，但加密货币市场的流动性格局完全不同。回测不仅要模拟价格变化，还需要考虑成交量、深度、买卖价差等微观结构因素。更新频率越高、换手率越高，偏差越大——60分钟调仓的偏差远小于5分钟调仓。</p>
+
+<h3>5.7 市场微观结构分析：从订单簿数据理解执行偏差</h3>
+<p>为了深入理解5.6中描述的偏差根源，我下载并分析了大量的订单簿（Order Book）数据，从市场微观结构层面量化了信号与执行之间的差距。具体工作包括：</p>
+<ul>
+  <li>对每个订单在存续时间内的盘口买一卖一价格范围进行统计，验证<strong>未成交订单的价格是否确实在盘口范围之外</strong>，成交订单是否在盘口范围之内。</li>
+  <li>统计未成交订单价格相对于盘口价格的偏移方向和幅度，区分BUY侧和SELL侧的偏移特征，发现SELL侧未成交的偏移幅度普遍大于BUY侧。</li>
+  <li>通过订单簿快照和历史成交数据（AggTrades），分析<strong>订单价格与实际可成交价格之间的差距</strong>，量化市场冲击成本和流动性成本。</li>
+  <li>将上述分析封装为一个独立的分析类，支持按交易对（Symbol）和订单方向（BUY/SELL）分别输出偏移量分布的可视化图表。</li>
+</ul>
+<p><strong>核心发现</strong>：订单在maker端未成交的概率与其价格偏离盘口中位数的程度呈正相关。当订单价格接近或优于盘口最优价时，成交概率显著提高。这一发现为后续优化下单策略（如动态调整挂单价格、混合使用maker和taker订单）提供了直接的实证依据。</p>
+
+<div class="img-placeholder">
+  <p><strong>📌 图5：实盘vs回测偏差分析图 / 订单簿偏移量分布图</strong></p>
+  <p><!-- 替换为：<img src="pictures/report/market_microstructure_analysis.png" alt="实盘偏差分析"> --></p>
+</div>
+
+<div class="back-to-top"><a href="#nav">↑ 返回顶部</a></div>
+
+<!-- ===== 6. 总结 ===== -->
+<h2 id="summary">6. 总结</h2>
+
+<h3>项目状态</h3>
+<p>本项目目前处于<strong>暂停维护状态</strong>。由于我的后续方向转向了AI与Web3交叉领域，原量化策略不再继续迭代。但报告中展示的建模框架、因子评估体系和工程实践经验，仍然适用于任何量化策略研发场景。</p>
+
+<h3>方向反思</h3>
+<p>截面多空策略在加密货币市场仍然存在显著的Alpha机会——但<strong>方法论需要从根本上转变</strong>。传统的量价因子（如动量、波动率、技术指标等）脱胎于传统期货市场，假设市场参与者结构和交易行为模式相对稳定。然而，加密货币市场的参与者结构、流动性分布和信息传导机制与传统市场存在本质差异——单纯移植传统量价因子，难以捕捉到加密货币市场真正的Alpha来源。</p>
+<p>我认为，加密货币截面多空因子的未来方向应该聚焦于<strong>链上数据</strong>：资金流向（交易所净流入/流出）、地址活跃度、持仓分布（鲸鱼地址vs散户地址）、智能合约交互行为等。这些数据是加密货币市场独有的，也是传统量价因子完全无法捕捉的信息维度。</p>
+
+<h3>能力积累</h3>
+<p>本项目中积累的核心能力包括：</p>
+<ul>
+  <li>三套建模框架（截面多目标回归、单标的时间序列、遗传规划因子挖掘），各有适用场景和技术特点</li>
+  <li>完整的因子评估体系，多个维度量化因子有效性</li>
+  <li>从数据处理、特征工程、模型训练到回测评估和实盘部署的全链路经验</li>
+  <li>一系列工程实践问题的排查与解决经验，涵盖数据异常、库函数bug、未来数据泄露、微观结构分析等多个层面</li>
+  <li>对回测与实盘偏差的深层理解，以及对市场微观结构的分析能力</li>
+</ul>
+
+<h3>个人感悟</h3>
+<p>用心做过的事情，失败也是经验，没必要把它完全抹掉，当作不存在。这份报告记录的不仅仅是一段工作经历，更是我在量化策略研发这条路上积累的方法论和判断力。这些认知不会因为策略的暂停而失去价值——它们已经成为我理解市场、设计系统和解决问题的底层能力。</p>
+<p>如果未来重新启动截面多空方向，我将以链上数据为核心特征来源，结合已有的模型框架和工程经验，探索真正适配加密货币市场的Alpha因子。</p>
+
+<p class="end-mark">— 报告完 —</p>
+
+<div class="back-to-top"><a href="#nav">↑ 返回顶部</a></div>
+
+</div><!-- /.container -->
+</body>
+</html>
