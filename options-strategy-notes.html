@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期权备兑策略 — 实践笔记</title>
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --surface: #141414;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --muted: #888;
+            --accent: #f0f0f0;
+            --font: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+            --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-size:15px;scroll-behavior:smooth}
+        body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.7;-webkit-font-smoothing:antialiased}
+        .container{width:100%;max-width:780px;margin:0 auto;padding:0 2rem}
+        .report-header{padding:5rem 0 3rem;border-bottom:1px solid var(--border);margin-bottom:3rem}
+        .report-header .label{font-family:var(--font);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem}
+        .report-header h1{font-family:var(--font);font-size:clamp(1.6rem,3vw,2rem);font-weight:600;line-height:1.3;letter-spacing:-0.02em;color:var(--accent);margin-bottom:1rem}
+        .report-header .subtitle{font-size:0.95rem;color:var(--muted);max-width:560px;line-height:1.6}
+        .report-header .meta{display:flex;gap:2rem;margin-top:2rem;font-family:var(--font);font-size:0.75rem;color:var(--muted);flex-wrap:wrap}
+        section{margin-bottom:3.5rem}
+        h2{font-family:var(--font);font-size:0.8rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:0.6rem;margin-bottom:1.8rem}
+        h3{font-family:var(--font);font-size:0.95rem;font-weight:600;color:var(--accent);margin-bottom:0.6rem;margin-top:1.8rem}
+        h3:first-child{margin-top:0}
+        p{font-size:0.9rem;color:var(--text);line-height:1.8;margin-bottom:1rem}
+        p.muted{color:var(--muted);font-size:0.85rem}
+        .terminal{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.2rem 1.5rem;margin:1.2rem 0;font-family:var(--font);font-size:0.78rem;line-height:1.7;color:var(--text);overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+        .terminal .comment{color:#666}
+        .terminal .warn{color:#e05555}
+        .terminal .pos{color:#5ab87a}
+        .data-table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-family:var(--font);font-size:0.78rem}
+        .data-table th{text-align:left;padding:0.6rem 0.8rem;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap}
+        .data-table td{padding:0.5rem 0.8rem;border-bottom:1px solid rgba(42,42,42,0.5);font-size:0.78rem}
+        .data-table .num{text-align:right;font-feature-settings:"tnum"}
+        .data-table .pos{color:#5ab87a}
+        .timeline{border-left:1px solid var(--border);padding-left:1.5rem;margin:1.5rem 0}
+        .timeline-item{margin-bottom:1.5rem;position:relative}
+        .timeline-item::before{content:"";position:absolute;left:-1.85rem;top:0.4rem;width:8px;height:8px;border-radius:50%;background:var(--border)}
+        .timeline-item.critical::before{background:#e05555}
+        .timeline-time{font-family:var(--font);font-size:0.7rem;color:var(--muted);letter-spacing:0.05em;margin-bottom:0.2rem}
+        .timeline-desc{font-size:0.88rem;line-height:1.7}
+        .callout{background:var(--surface);border-left:3px solid #f0c060;padding:1rem 1.3rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:0.85rem;line-height:1.7;color:#d0d0d0}
+        .callout.warn{border-left-color:#e05555}
+        .callout strong{color:var(--accent)}
+        a{color:var(--accent);text-decoration:none;border-bottom:1px solid #444;transition:border-color 0.2s}
+        a:hover{border-color:var(--accent)}
+        .report-footer{border-top:1px solid var(--border);padding:2.5rem 0;margin-top:4rem;font-family:var(--font);font-size:0.75rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+        .report-footer a{color:var(--muted);border-bottom:1px solid #333}
+        @media(max-width:600px){.container{padding:0 1.2rem}.data-table{font-size:0.7rem}.data-table th,.data-table td{padding:0.4rem 0.5rem}.report-header{padding:3rem 0 2rem}}
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+<header class="report-header">
+    <div class="label">实践笔记</div>
+    <h1>期权备兑策略</h1>
+    <p class="subtitle">
+        Sell Covered Call 手动践行记录。不赌方向，只收租金。
+        从"发明策略"到"发现规律"的转变。
+    </p>
+    <div class="meta">
+        <span>周期：2026.04.19 — 至今</span>
+        <span>标的：BTC/USDT</span>
+        <span>交易所：Bybit（UTA）+ Gate.io（现货）</span>
+        <span>无代码，纯手动</span>
+    </div>
+</header>
+
+<!-- 1. 策略逻辑 -->
+<section>
+    <h2>1. 策略逻辑</h2>
+
+    <h3>做什么</h3>
+    <p>
+        持有 BTC 现货，卖出虚值看涨期权（Sell Covered Call），收取权利金。
+    </p>
+    <div class="terminal">
+<span class="comment"># Covered Call 基本逻辑</span>
+持有 1 BTC 现货
+卖出 1 张 BTC 看涨期权，行权价高于现价（虚值）
+
+<span class="pos">到期时 BTC 没涨到行权价：</span>
+  → 期权作废，白赚权利金
+  → 继续持有 BTC，下周再卖
+
+<span class="warn">到期时 BTC 涨破行权价：</span>
+  → 按行权价卖掉 BTC（止盈）
+  → 权利金照收
+  → 然后卖 Put 接回来，形成轮动
+            </div>
+
+    <h3>为什么做这个</h3>
+    <p>
+        以前做量化交易时，一直迷失在回测曲线的"优雅陷阱"里——不断发明复杂策略，回测漂亮，
+        实盘崩。后来意识到，应该从"发明"转向"发现"。
+    </p>
+    <p>
+        期权卖方在概率上天然占优：时间价值每天归零，恐慌溢价长期存在，而且不赌方向。
+        这符合我的性格——不想盯盘、不想高频博弈、只想稳定现金流。
+    </p>
+
+    <h3>行权价选择</h3>
+    <div class="terminal">
+<span class="comment"># 核心原则：虚值幅度 5%-10%</span>
+正常市场（DVOL 40-55）：选 5%-8% 虚值
+恐慌市场（DVOL > 55）： 选 8%-10% 虚值（更保守，但权利金更厚）
+极度平静（DVOL < 40）：  轻仓或空仓，只在局部溢价时用小仓位抓机会
+            </div>
+
+    <h3>渔网阵</h3>
+    <p>
+        后期进化出一种"渔网阵"策略——不主动吃单，挂高价限价单被动等成交。
+        只在市场恐慌、IV 飙升时，别人愿意出高价买保险时，才被成交。
+        这改变了在 IV 低迷时贱卖保单的坏习惯。
+    </p>
+</section>
+
+<!-- 2. 实践记录 -->
+<section>
+    <h2>2. 实践记录</h2>
+
+    <h3>交易概览（2026.04.19 — 05.06）</h3>
+    <table class="data-table">
+        <thead>
+            <tr><th>指标</th><th class="num">数据</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>已结算笔数</td><td class="num">10 笔</td></tr>
+            <tr><td>胜率</td><td class="num pos">100%（10/10）</td></tr>
+            <tr><td>被行权次数</td><td class="num">0（1 笔临近行权）</td></tr>
+            <tr><td>持仓周期</td><td class="num">7-10 天/笔（主力仓位）</td></tr>
+            <tr><td>年化收益率（按总资产）</td><td class="num pos">~5.3%</td></tr>
+        </tbody>
+    </table>
+    <p class="muted">* 年化收益率按总资产（BTC现货 + USDT）计算。实际仓位利用率极低（~50%），按动用仓位算年化远高于此数。
+    另外 BTC 现货本身从 75,000 涨到 81,000 的增值是策略最大的收益来源，未计入期权收益。</p>
+
+    <h3>关键事件时间线</h3>
+    <div class="timeline">
+        <div class="timeline-item critical">
+            <div class="timeline-time">第一单</div>
+            <div class="timeline-desc">
+                <strong>差点裸卖。</strong>还没来得及买现货就开了 Call，被提醒裸卖的风险（亏损无上限）。
+                立刻补买现货，转成备兑。裸卖从此被设为红线。
+            </div>
+        </div>
+        <div class="timeline-item critical">
+            <div class="timeline-time">第三单 — "ICU 惊魂"</div>
+            <div class="timeline-desc">
+                卖出 78,500 Call。持仓期间 BTC 从 75,000 飙到 79,000，期权从虚值变实值，
+                浮亏一度超过 100%。差点在恐慌中平仓止损。但到期时 BTC 回落至 77,000，
+                期权作废，赚了 3.82 USDT。<strong>欧式期权只看终点，中途的波动都是纸老虎。</strong>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">六连胜后</div>
+            <div class="timeline-desc">
+                连续六笔全胜，开始有点飘。把行权价从 82,000 挪到 81,000（离现价更近，想吃更多权利金）。
+                结果 BTC 反弹，这笔目前仍在持仓中且深度实值，大概率被行权。<strong>连胜之后应该收紧风险敞口，而不是放松。</strong>
+            </div>
+        </div>
+    </div>
+
+    <h3>被行权后的计划</h3>
+    <p>
+        如果 81,000 Call 被行权：按 81,000 卖掉 BTC（止盈）→ 用卖币后的 USDC 开始卖虚值 Put
+        → 在等待接回 BTC 的过程中继续收租金 → 形成"卖 Call → 被行权 → 卖 Put → 接回 BTC → 再卖 Call"的轮动闭环。
+    </p>
+</section>
+
+<!-- 3. 认知收获 -->
+<section>
+    <h2>3. 认知收获</h2>
+
+    <h3>从"发明"到"发现"</h3>
+    <p>
+        真正的规律不需要发明——时间价值会归零、恐慌溢价会消退、概率站在卖方这边。
+        我只是需要去发现它们。这个认知转变比策略本身更重要。
+    </p>
+
+    <h3>仓位决定心态，保证金决定生死</h3>
+    <p>
+        ICU 惊魂那次不是策略错了，而是仓位够小，扛住了。如果仓位放大 10 倍，早就被动止损了。
+        <strong>交易里最核心的不是技术，是风控。</strong>
+    </p>
+
+    <h3>三条教训</h3>
+    <ul style="list-style:none;padding-left:0;margin:1rem 0;">
+        <li style="padding-left:1.5rem;position:relative;margin-bottom:0.5rem;font-size:0.88rem;">
+            <span style="position:absolute;left:0;color:#555;">—</span>
+            <strong>不在 IV 低迷时开主力仓：</strong>亏得最多的单子是在 IV 最低时成交的。以后只在 IV 溢价时撒网。
+        </li>
+        <li style="padding-left:1.5rem;position:relative;margin-bottom:0.5rem;font-size:0.88rem;">
+            <span style="position:absolute;left:0;color:#555;">—</span>
+            <strong>连胜后主动收紧虚值：</strong>连胜 4 笔以上，下一笔必须选更保守的行权价。
+        </li>
+        <li style="padding-left:1.5rem;position:relative;margin-bottom:0.5rem;font-size:0.88rem;">
+            <span style="position:absolute;left:0;color:#555;">—</span>
+            <strong>裸卖是红线：</strong>裸卖和备兑有天壤之别——前者亏损无上限，后者最大亏损是"少赚"。
+        </li>
+    </ul>
+
+    <h3>期权备兑 vs 资金费率套利</h3>
+    <div class="terminal">
+<span class="comment"># 两者的相似之处</span>
+· 都是"收租"逻辑，赚的是确定性溢价
+· 都不赌方向，靠概率优势
+· 都是 Crypto 市场独有的结构性机会
+
+<span class="comment"># 两者的不同之处</span>
+· 资金费率套利：需要同时持有现货+做空永续合约，资金占用大
+· 期权备兑：    只需持有现货，资金效率更高
+· 资金费率套利：面临"费率转负"风险（熊市里空头付钱）
+· 期权卖方：    熊市/震荡市都赚钱，只在暴涨时被行权（但也是止盈）
+· 期权的灵活度更高：可选不同到期日、行权价、IV 环境来调整风险收益比
+            </div>
+
+    <div class="callout">
+        <strong>一句话总结：</strong>资金费率套利是在捡地上的硬币，期权备兑是在卖保险——
+        两者都是老实生意，但后者给你更多的定价权和组合空间。
+    </div>
+</section>
+
+<footer class="report-footer">
+    <span>期权备兑策略 · 实践笔记</span>
+    <span><a href="https://mxdu.me">mxdu.me</a></span>
+</footer>
+
+</div>
+
+</body>
+</html>

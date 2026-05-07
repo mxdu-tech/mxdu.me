@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel — 小资金资金费率套利监控系统</title>
+    <style>
+        :root {
+            --bg: #0d0d0d;
+            --surface: #141414;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --muted: #888;
+            --accent: #f0f0f0;
+            --font: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+            --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{font-size:15px;scroll-behavior:smooth}
+        body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.7;-webkit-font-smoothing:antialiased}
+        .container{width:100%;max-width:780px;margin:0 auto;padding:0 2rem}
+        .report-header{padding:5rem 0 3rem;border-bottom:1px solid var(--border);margin-bottom:3rem}
+        .report-header .label{font-family:var(--font);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem}
+        .report-header h1{font-family:var(--font);font-size:clamp(1.6rem,3vw,2rem);font-weight:600;line-height:1.3;letter-spacing:-0.02em;color:var(--accent);margin-bottom:1rem}
+        .report-header .subtitle{font-size:0.95rem;color:var(--muted);max-width:560px;line-height:1.6}
+        .report-header .meta{display:flex;gap:2rem;margin-top:2rem;font-family:var(--font);font-size:0.75rem;color:var(--muted);flex-wrap:wrap}
+        section{margin-bottom:3.5rem}
+        h2{font-family:var(--font);font-size:0.8rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:0.6rem;margin-bottom:1.8rem}
+        h3{font-family:var(--font);font-size:0.95rem;font-weight:600;color:var(--accent);margin-bottom:0.6rem;margin-top:1.8rem}
+        h3:first-child{margin-top:0}
+        p{font-size:0.9rem;color:var(--text);line-height:1.8;margin-bottom:1rem}
+        p.muted{color:var(--muted);font-size:0.85rem}
+        .terminal{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.2rem 1.5rem;margin:1.2rem 0;font-family:var(--font);font-size:0.78rem;line-height:1.7;color:var(--text);overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+        .terminal .comment{color:#666}
+        .terminal .highlight{color:#f0c060}
+        .terminal .warn{color:#e05555}
+        .terminal .pos{color:#5ab87a}
+        .data-table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-family:var(--font);font-size:0.78rem}
+        .data-table th{text-align:left;padding:0.6rem 0.8rem;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap}
+        .data-table td{padding:0.5rem 0.8rem;border-bottom:1px solid rgba(42,42,42,0.5);font-size:0.78rem}
+        .data-table .num{text-align:right;font-feature-settings:"tnum"}
+        .data-table .neg{color:#e05555}
+        .data-table .pos{color:#5ab87a}
+        .timeline{border-left:1px solid var(--border);padding-left:1.5rem;margin:1.5rem 0}
+        .timeline-item{margin-bottom:1.5rem;position:relative}
+        .timeline-item::before{content:"";position:absolute;left:-1.85rem;top:0.4rem;width:8px;height:8px;border-radius:50%;background:var(--border)}
+        .timeline-item.critical::before{background:#e05555}
+        .timeline-item.milestone::before{background:#f0c060}
+        .timeline-time{font-family:var(--font);font-size:0.7rem;color:var(--muted);letter-spacing:0.05em;margin-bottom:0.2rem}
+        .timeline-desc{font-size:0.88rem;line-height:1.7}
+        .callout{background:var(--surface);border-left:3px solid #f0c060;padding:1rem 1.3rem;margin:1.5rem 0;border-radius:0 6px 6px 0;font-size:0.85rem;line-height:1.7;color:#d0d0d0}
+        .callout.warn{border-left-color:#e05555}
+        .callout strong{color:var(--accent)}
+        a{color:var(--accent);text-decoration:none;border-bottom:1px solid #444;transition:border-color 0.2s}
+        a:hover{border-color:var(--accent)}
+        .report-footer{border-top:1px solid var(--border);padding:2.5rem 0;margin-top:4rem;font-family:var(--font);font-size:0.75rem;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+        .report-footer a{color:var(--muted);border-bottom:1px solid #333}
+        @media(max-width:600px){.container{padding:0 1.2rem}.data-table{font-size:0.7rem}.data-table th,.data-table td{padding:0.4rem 0.5rem}.report-header{padding:3rem 0 2rem}}
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+<header class="report-header">
+    <div class="label">项目报告</div>
+    <h1>Sentinel — 小资金资金费率套利监控系统</h1>
+    <p class="subtitle">
+        面向小资金的高年化套利工具。四层漏斗扫描 5 个交易所的资金费率与期现价差，
+        Telegram 实时推送。手动跟单 3 笔，年化收益率 66% ~ 232%。下一步：自动化交易。
+    </p>
+    <div class="meta">
+        <span>运行周期：2025.04 — 至今</span>
+        <span>交易所：Binance / OKX / Bybit / Gate / Bitget</span>
+        <span>源码：私有</span>
+    </div>
+</header>
+
+<!-- 1. 系统概述 -->
+<section>
+    <h2>1. 系统概述</h2>
+
+    <h3>设计动机</h3>
+    <p>
+        资金费率套利是一个古老但有效的策略。问题是，市场上的监控工具要么太贵（机构级），要么太糙（只支持单交易所）。
+        写 Sentinel 的初衷很简单：<strong>我需要一个能同时扫 5 个交易所、按我的逻辑筛选、精准推送到手机的工具。</strong>
+    </p>
+    <p>
+        Sentinel 不替你做交易决策。它是一台"金属探测器"——平时安静，机会来的时候响一声。
+        筛选逻辑是我自己定义的，推送的消息是我自己看的，单子是我自己手动开的。
+    </p>
+
+    <h3>四层漏斗架构</h3>
+    <p>
+        全市场有数千个永续合约，每秒都在产生资金费率数据。如果每个都推送到手机，那就是噪音轰炸。
+        Sentinel 用四层漏斗逐级过滤：
+    </p>
+    <div class="terminal">
+<span class="comment"># 四层漏斗筛选逻辑</span>
+<span class="highlight">第一层：全市场费率快照</span>
+  → 扫 5 个交易所所有永续合约
+  → 筛出费率绝对值 &gt; 0.1% 的币种
+  → 过滤日交易量 &lt; 5 万 U 的小币种
+  → 检测 8 小时内费率突变 &gt; 0.2%
+
+<span class="highlight">第二层：期现价差 + 跨所溢价检测</span>
+  → 同所：合约价 vs 现货价的溢价
+  → 跨所：A 所合约价 vs B 所现货价的溢价
+  → 溢价 &gt; 0.5% 且 &lt; 20%（过滤数据噪声）
+
+<span class="highlight">第三层：合约卖盘深度甜点区检测</span>
+  → 取卖一价 ±2% 范围内的挂单深度
+  → 甜点区：0 ~ 5,000 U（适合小资金）
+  → 分三档标注：small / medium / large
+
+<span class="highlight">第四层：告警分级 + 冷却 + 推送</span>
+  → L1：三信号共振（费率+价差+深度）→ 无冷却，每次必推
+  → L2：双信号 → 30 分钟冷却
+  → L3：单信号 → 30 分钟冷却
+  → 推送包含：各所费率、合约/现货价格、跨所最优溢价、深度档位
+            </div>
+
+    <h3>附加能力：持仓风险监控</h3>
+    <p>
+        在 <code>portfolio.yaml</code> 中手动录入已开仓的币种后，Sentinel 会自动监控持仓风险：
+    </p>
+    <div class="terminal">
+<span class="comment"># 持仓风险检测逻辑</span>
+正向套利（买现货+做空合约）：
+  → 费率转负时 → <span class="warn">L1 告警</span>
+  → 溢价转负时 → <span class="warn">L2 告警</span>
+
+反向套利（借币卖出+做多合约）：
+  → 费率转正时 → <span class="warn">L1 告警</span>
+            </div>
+
+    <h3>技术栈</h3>
+    <table class="data-table">
+        <thead><tr><th>组件</th><th>选型</th></tr></thead>
+        <tbody>
+            <tr><td>数据采集</td><td>CCXT（统一 API 层）</td></tr>
+            <tr><td>OKX 费率</td><td>REST API 直调（绕过 CCXT 的 load_markets 超时问题）</td></tr>
+            <tr><td>存储</td><td>SQLite（WAL 模式）</td></tr>
+            <tr><td>推送</td><td>Telegram Bot API</td></tr>
+            <tr><td>部署</td><td>Docker Compose，挂 VPS 7×24 运行</td></tr>
+            <tr><td>配置管理</td><td>YAML + .env</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- 2. 实盘记录 -->
+<section>
+    <h2>2. 实盘交易记录</h2>
+
+    <p>
+        系统上线后，手动跟单 3 笔，全部盈利。本金量级均为几十到几百 U 的小资金测试单，
+        重点观察的是策略逻辑是否成立、系统信号是否可靠，而非绝对收益金额。
+    </p>
+
+    <h3>收益率汇总</h3>
+    <table class="data-table">
+        <thead>
+            <tr><th>币种</th><th>类型</th><th class="num">运行天数</th><th>状态</th><th class="num">年化收益率</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>FIO</td><td>跨所（Bybit 合约 + Gate 现货）</td>
+                <td class="num">8 天</td><td>已平仓</td>
+                <td class="num pos">~109%</td>
+            </tr>
+            <tr>
+                <td>PTB</td><td>同所（Gate 合约 + Gate 现货）</td>
+                <td class="num">10 天</td><td>运行中</td>
+                <td class="num pos">~232%</td>
+            </tr>
+            <tr>
+                <td>ASP</td><td>跨所（Bybit 合约 + Gate 现货）</td>
+                <td class="num">10 天</td><td>运行中</td>
+                <td class="num pos">~66%</td>
+            </tr>
+            <tr style="border-top: 1px solid var(--border);">
+                <td><strong>组合</strong></td><td></td><td class="num"><strong>~10 天</strong></td><td></td>
+                <td class="num pos"><strong>~180%</strong></td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="muted">* 年化收益率 = 净盈利 / 本金 × (365 / 持仓天数)。小资金在特定高费率窗口期的收益，
+    不代表可持续的长期年化。随着本金规模增长，可容纳的套利机会减少，收益率会自然下降。</p>
+
+    <h3>FIO：4月22日 → 4月30日（已平仓）</h3>
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-time">4.22</div>
+            <div class="timeline-desc">Bybit 做空 + Gate 买入，建立跨所对冲头寸。开仓时费率约 0.2%。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">4.22 - 4.28</div>
+            <div class="timeline-desc">资金费率持续为正（0.1% ~ 0.4%），每日稳定收取资费。</div>
+        </div>
+        <div class="timeline-item critical">
+            <div class="timeline-time">4.28</div>
+            <div class="timeline-desc"><strong>Sentinel 告警：</strong>Bybit 公告 FIO 将于 4.30 下架。这是小币种套利的典型风险——下架风险。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">4.30 上午</div>
+            <div class="timeline-desc">手动市价平仓两腿。持仓 8 天，<strong>年化收益率约 109%</strong>。</div>
+        </div>
+    </div>
+    <div class="callout">
+        <strong>经验：</strong>FIO 是第一个完整经历生命周期的案例。从高费率入场 → 下架公告 → 手动平仓，
+        整个过程验证了"正向套利 + 条件止损单联动"的策略框架。下架风险是小币种套利必须考虑的因素。
+    </div>
+
+    <h3>PTB：4月28日 → 至今（运行中）</h3>
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-time">4.28</div>
+            <div class="timeline-desc">Gate 同所套利：现货买入 + 合约做空。同所套利无跨所爆仓风险，但资金效率较低（Gate 不支持组合保证金，两条腿各占保证金）。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">4.28 - 5.7</div>
+            <div class="timeline-desc">资费持续为正，稳定结算。是目前运行最平稳的单子。</div>
+        </div>
+        <div class="timeline-item milestone">
+            <div class="timeline-time">5.7（统计时点）</div>
+            <div class="timeline-desc">持仓 10 天，<strong>年化收益率约 232%</strong>，三笔中最高。同所套利的稳定性在此体现——没有跨所价差在极端行情中开口的风险。</div>
+        </div>
+    </div>
+
+    <h3>ASP：4月28日 → 至今（运行中）</h3>
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-time">4.28</div>
+            <div class="timeline-desc">Bybit 做空 + Gate 买入，跨所套利。</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">4.28 - 5.7</div>
+            <div class="timeline-desc">运行平稳，资费稳定收入。</div>
+        </div>
+        <div class="timeline-item milestone">
+            <div class="timeline-time">5.7（统计时点）</div>
+            <div class="timeline-desc">持仓 10 天，<strong>年化收益率约 66%</strong>。偏低，但跨所套利的稳定性本就不如同所。</div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. 关键认知 -->
+<section>
+    <h2>3. 关键认知与经验</h2>
+
+    <h3>同所 vs 跨所套利</h3>
+    <p>
+        PTB（同所）的收益率远超 FIO 和 ASP（跨所）。原因很简单：
+    </p>
+    <div class="terminal">
+<span class="comment"># 同所套利 vs 跨所套利</span>
+<span class="pos">同所套利优势：</span>
+  · 无跨所价差风险（极端行情中 A 所和 B 所的价差可能剧烈波动）
+  · 清算逻辑在同一系统内，不会出现一边被强平另一边还在跑的情况
+  · 操作更简单，两条腿在同一交易界面管理
+
+<span class="warn">同所套利劣势：</span>
+  · 资金效率低（不支持组合保证金，两条腿各占保证金）
+  · 机会少（同一交易所内现货和合约同时有高费率的币种有限）
+            </div>
+
+    <h3>借贷利率异动是"信号"</h3>
+    <p>
+        FIO 持仓期间，Gate 余币宝年化利率从 12% 飙升至 242%。当时分析认为：
+        大量裸空者在借币卖空，导致借贷需求激增。
+        <strong>这从侧面印证了我们做空的套利方向是正确的——市场上有很多人在和我们做同样的方向。</strong>
+    </p>
+    <div class="callout">
+        <strong>认知升级：</strong>借贷利率不仅是成本指标，更是市场情绪的领先指标。当借贷利率飙升时，
+        说明大量资金在借币做空，资金费率大概率还会维持高位甚至继续上涨。
+        这个信号比单纯看费率数字更有信息量。
+    </div>
+
+    <h3>小资金的优势</h3>
+    <p>
+        三笔单子的本金都在小几百 U 的量级。这个量级的资金有独特的优势：
+    </p>
+    <ul style="list-style:none;padding-left:0;margin:1rem 0;">
+        <li style="padding-left:1.5rem;position:relative;margin-bottom:0.5rem;font-size:0.88rem;">
+            <span style="position:absolute;left:0;color:#555;">—</span>
+            <strong>可以吃机构吃不下的机会：</strong>第三层深度甜点区检测专门过滤 0 ~ 5,000 U 的区间。大资金进不来，小资金刚好。
+        </li>
+        <li style="padding-left:1.5rem;position:relative;margin-bottom:0.5rem;font-size:0.88rem;">
+            <span style="position:absolute;left:0;color:#555;">—</span>
+            <strong>滑点可控：</strong>小单量的滑点百分比对大资金是致命的，对小资金只是摩擦成本。
+        </li>
+        <li style="padding-left:1.5rem;position:relative;margin-bottom:0.5rem;font-size:0.88rem;">
+            <span style="position:absolute;left:0;color:#555;">—</span>
+            <strong>可以快速迭代：</strong>本金分多单，每单都是独立实验。反馈周期极短，策略可以快速进化。
+        </li>
+    </ul>
+
+    <h3>从手动到自动的路线图</h3>
+    <p>
+        目前所有单子都是 Sentinel 推送 → 我手动判断 → 手动开仓。
+        下一步的方向是自动化执行：
+    </p>
+    <div class="terminal">
+<span class="comment"># 自动化路线图</span>
+Phase 1（当前）：手动跟单，积累经验 ✓
+Phase 2（下一步）：Sentinel 信号 → 自动开仓（预设仓位大小、止损条件）
+Phase 3（远期）：全自动，信号触发 → 开仓 → 持仓监控 → 风险平仓
+    </div>
+</section>
+
+<!-- 4. 工程迭代 -->
+<section>
+    <h2>4. 工程迭代记录</h2>
+    <p>
+        系统上线后经历了一次集中的大量迭代。4 月 28 日一天内完成 7 项改动，将系统从"噪音轰炸"进化到"精准推送"：
+    </p>
+    <table class="data-table">
+        <thead>
+            <tr><th>日期</th><th>改动</th><th>效果</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>4.28</td><td>消息格式改为汇总视图</td><td>从碎片化信号 → 一条消息包含费率+价差+深度全貌</td></tr>
+            <tr><td>4.28</td><td>溢价方向过滤</td><td>正向套利只推溢价为正的信号，反向套利只推溢价为负</td></tr>
+            <tr><td>4.28</td><td>价差异常过滤（>20% 忽略）</td><td>过滤掉因数据源问题导致的虚假信号</td></tr>
+            <tr><td>4.28</td><td>心跳监测</td><td>每日 12:00 发送系统状态，确认 VPS 仍在运行</td></tr>
+            <tr><td>4.28</td><td>持仓感知</td><td>portfolio.yaml 中录入的持仓自动切换为风险监控模式</td></tr>
+            <tr><td>4.28</td><td>OKX 专用费率拉取逻辑</td><td>解决 CCXT 的 load_markets 超时问题</td></tr>
+            <tr><td>4.28</td><td>忽略列表</td><td>过滤已下架/数据异常币种（如 XCN、TRU）</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- 5. 技术细节 -->
+<section>
+    <h2>5. 技术细节</h2>
+
+    <h3>OKX 数据拉取的坑</h3>
+    <p>
+        CCXT 的 <code>fetch_funding_rates()</code> 在 OKX 上会内部触发 <code>load_markets</code>，
+        而 <code>load_markets</code> 会同时拉 SPOT 和 SWAP 的 instruments。在 OKX 上 SPOT instruments
+        数据量极大，经常超时。最终绕过 CCXT，直接用 OKX REST API 的
+        <code>/api/v5/public/instruments?instType=SWAP</code> + <code>/api/v5/public/funding-rate</code>，
+        逐个合约拉费率。
+    </p>
+
+    <h3>价差异常过滤</h3>
+    <p>
+        初期版本频繁推送假信号——某个小币种的溢价高达 50%、80%。排查后发现是某些交易所有该币种的合约但没有现货，
+        导致取到的现货价格来自其他渠道（可能是链上池子），产生虚假价差。
+        加上 <code>abs(premium) > 20%</code> 的硬过滤后，假信号基本消失。
+    </p>
+
+    <h3>部署方案</h3>
+    <div class="terminal">
+<span class="comment"># 一键部署到 VPS</span>
+git clone &lt;repo&gt; && cd sentinel
+cp .env.example .env  <span class="comment"># 填 Telegram Token + Chat ID</span>
+docker compose up -d
+<span class="comment"># 本地关机，VPS 继续跑，Telegram 持续收消息</span>
+            </div>
+</section>
+
+<!-- Footer -->
+<footer class="report-footer">
+    <span>Sentinel — 小资金资金费率套利监控系统</span>
+    <span><a href="https://mxdu.me">mxdu.me</a></span>
+</footer>
+
+</div>
+
+</body>
+</html>

@@ -44,7 +44,6 @@
             padding: 0 2rem;
         }
 
-        /* Header */
         .report-header {
             padding: 5rem 0 3rem 0;
             border-bottom: 1px solid var(--border);
@@ -87,7 +86,6 @@
             flex-wrap: wrap;
         }
 
-        /* Section */
         section {
             margin-bottom: 3.5rem;
         }
@@ -129,7 +127,6 @@
             font-size: 0.85rem;
         }
 
-        /* Code / terminal blocks */
         .terminal {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -157,7 +154,6 @@
             color: #e05555;
         }
 
-        /* Data table */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -198,7 +194,6 @@
             color: #5ab87a;
         }
 
-        /* Timeline */
         .timeline {
             border-left: 1px solid var(--border);
             padding-left: 1.5rem;
@@ -238,7 +233,6 @@
             line-height: 1.7;
         }
 
-        /* Callout */
         .callout {
             background: var(--surface);
             border-left: 3px solid #f0c060;
@@ -258,14 +252,12 @@
             color: var(--accent);
         }
 
-        /* Section divider */
         .divider {
             border: none;
             border-top: 1px dashed var(--border);
             margin: 2rem 0;
         }
 
-        /* Links */
         a {
             color: var(--accent);
             text-decoration: none;
@@ -277,7 +269,6 @@
             border-color: var(--accent);
         }
 
-        /* Footer */
         .report-footer {
             border-top: 1px solid var(--border);
             padding: 2.5rem 0;
@@ -296,7 +287,6 @@
             border-bottom: 1px solid #333;
         }
 
-        /* Image placeholder */
         .img-placeholder {
             background: var(--surface);
             border: 1px dashed var(--border);
@@ -308,6 +298,18 @@
             font-size: 0.75rem;
             margin: 1.5rem 0;
             letter-spacing: 0.05em;
+        }
+
+        .privacy-note {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.8rem 1.2rem;
+            margin: 1rem 0 2rem 0;
+            font-family: var(--font);
+            font-size: 0.72rem;
+            color: var(--muted);
+            letter-spacing: 0.04em;
         }
 
         @media (max-width: 600px) {
@@ -337,15 +339,19 @@
             <h1>资金费率套利实盘管理</h1>
             <p class="subtitle">
                 OKX / Binance 多账户资金费率套利策略的实盘管理记录。
-                涵盖组合设计、保证金管理、wrapped asset 折价套利，
+                涵盖组合设计、保证金管理、wrapped asset 折价套利、反向套利，
                 以及 251011 黑天鹅事件的完整应急过程。
             </p>
             <div class="meta">
                 <span>周期：2025.09 — 2025.11</span>
-                <span>账户规模：~250W USDT + 14 BTC</span>
                 <span>交易所：OKX / Binance</span>
             </div>
         </header>
+
+        <div class="privacy-note">
+            ⚠ 隐私声明：本报告中所有账户名称已做匿名化处理，以别名（USDT本位 / BTC本位 / ETH本位 + 编号）替代，
+            配置数据经过脱敏处理，不包含任何客户真实信息。
+        </div>
 
         <!-- 1. 策略概述 -->
         <section>
@@ -353,18 +359,19 @@
 
             <h3>核心逻辑</h3>
             <p>
-                资金费率套利的核心是：持有现货 + 做空永续合约，收取多头支付给空头的资金费率。
-                当费率为正时，空头每8小时收取一次费用，年化收益可观且方向中性。
+                资金费率套利的经典结构：持有现货 + 做空永续合约，收取多头支付给空头的资金费率。
+                当费率为正时，空头每8小时收取一次费用；当费率为负且有利可图时，方向反转——
+                借币卖出（做空现货）+ 做多永续合约，收取空头支付给多头的费用。
+                开仓与平仓均有成本，因此入场需要综合考量借币利率、当前费率水平以及交易摩擦损耗。
             </p>
             <p>
-                实际执行中，策略远不止"开空然后躺着收钱"。真正的利润来源有三层：
+                实际执行中，利润来源有三层：
             </p>
             <p>
-                <strong>① 纯资金费率套利</strong> — 在 vanilla 榜单中筛选费率高、OI 大、流动性好的币种，做空永续合约。<br>
+                <strong>① 纯资金费率套利</strong> — 在 vanilla 榜单中筛选费率高、OI 大、流动性好的币种，建立对冲头寸。<br>
                 <strong>② Wrapped Asset 折价套利</strong> — BETH/ETH、OKSOL/SOL、WBETH/ETH 等质押代币存在二级市场折价。
-                用折价买入 wrapped asset + 做空对应合约，多赚一层折价回归收益。<br>
-                <strong>③ Staking 收益叠加</strong> — OKSOL、BETH 等本身有质押收益（OKSOL ~0.5bp/8h，BETH ~0.23bp/8h），
-                叠加在资金费率之上，增强回报。
+                折价买入 wrapped asset + 做空对应合约，多赚一层折价回归收益。<br>
+                <strong>③ Staking 收益叠加</strong> — OKSOL、BETH 等本身有质押收益，叠加在资金费率之上，增强回报。
             </p>
 
             <h3>组合设计原则</h3>
@@ -381,51 +388,51 @@ OKSOL 流动性尚可但不超 0.3  <span class="comment"># 折价波动可控</
             </div>
 
             <p>
-                以 mia-24W-usdt 账户为例的配置：
+                以下为一份已脱敏的示例配置：
             </p>
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>Pair</th>
                         <th class="num">占比</th>
-                        <th class="num">周化收益率</th>
+                        <th class="num">周化收益率（参考）</th>
                         <th>备注</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>XAUT-USDT-SWAP</td>
+                        <td>品种 A（稳定型）</td>
                         <td class="num">0.10</td>
-                        <td class="num pos">0.14%</td>
+                        <td class="num pos">~0.14%</td>
                         <td>稳定</td>
                     </tr>
                     <tr>
-                        <td>OKSOL-USDT-SWAP</td>
+                        <td>品种 B（质押型）</td>
                         <td class="num">0.30</td>
-                        <td class="num pos">0.13%</td>
+                        <td class="num pos">~0.13%</td>
                         <td>质押品种</td>
                     </tr>
                     <tr>
-                        <td>DOGE-USDT-SWAP</td>
+                        <td>品种 C</td>
                         <td class="num">0.20</td>
-                        <td class="num pos">0.08%</td>
+                        <td class="num pos">~0.08%</td>
                         <td></td>
                     </tr>
                     <tr>
-                        <td>BTC-USDC-SWAP</td>
+                        <td>品种 D（大币种）</td>
                         <td class="num">0.40</td>
-                        <td class="num pos">0.11%</td>
+                        <td class="num pos">~0.11%</td>
                         <td></td>
                     </tr>
                     <tr style="border-top: 1px solid var(--border);">
                         <td><strong>组合合计</strong></td>
                         <td class="num"><strong>1.00</strong></td>
-                        <td class="num pos"><strong>0.11%</strong></td>
-                        <td><strong>年化 ~5.76%</strong></td>
+                        <td class="num pos"><strong>~0.11%</strong></td>
+                        <td><strong>年化 ~5.76%（无杠杆）</strong></td>
                     </tr>
                 </tbody>
             </table>
-            <p class="muted">* 以上为无杠杆基础收益率。加上 2-3x 杠杆后年化可达 15-20%。但杠杆也放大了黑天鹅风险。</p>
+            <p class="muted">* 以上为脱敏后的示例配置，非客户实际数据。无杠杆基础收益率。杠杆会放大收益，也会放大黑天鹅风险。</p>
 
         </section>
 
@@ -462,19 +469,19 @@ OKSOL 流动性尚可但不超 0.3  <span class="comment"># 折价波动可控</
                     <tr>
                         <td>OKSOL/SOL</td>
                         <td class="num">千 1 - 千 2</td>
-                        <td class="num neg">0.9880 (千 12)</td>
+                        <td class="num neg">0.9880（千 12）</td>
                         <td>中等</td>
-                        <td>5 天 / 即时赎回（每日限额 240 SOL）</td>
+                        <td>~5 天 / 即时赎回（个人固定额度每日 240 SOL）</td>
                     </tr>
                     <tr>
                         <td>BETH/ETH</td>
                         <td class="num">千 3 - 千 5</td>
-                        <td class="num neg">0.9941 (千 6)</td>
+                        <td class="num neg">0.9941（千 6）</td>
                         <td>极差</td>
-                        <td>56 天 / 即时赎回（每日限额 100 ETH）</td>
+                        <td>~56 天 / 即时赎回（个人固定额度每日 100 ETH）</td>
                     </tr>
                     <tr>
-                        <td>WBETH/ETH (Binance)</td>
+                        <td>WBETH/ETH（Binance）</td>
                         <td class="num">千 1</td>
                         <td class="num">—</td>
                         <td>较好</td>
@@ -482,7 +489,7 @@ OKSOL 流动性尚可但不超 0.3  <span class="comment"># 折价波动可控</
                     </tr>
                 </tbody>
             </table>
-            <p class="muted">* OKSOL 折价在 1011 黑天鹅当日最低触及 0.9880，但相比 BETH 的流动性危机，OKSOL 的赎回渠道（每日 240 SOL 即时赎回）提供了关键缓冲。</p>
+            <p class="muted">* OKSOL 折价在 1011 黑天鹅当日最低触及 0.9880，但因有即时赎回渠道（每日 240 SOL），相比 BETH 提供了关键缓冲。</p>
 
             <h3>日常操作流程</h3>
             <div class="terminal">
@@ -493,7 +500,7 @@ OKSOL 流动性尚可但不超 0.3  <span class="comment"># 折价波动可控</
 4. 查看借贷利率是否过高（过高 = 亏损期，熬过去）
 5. 查看质押币种是否达到上限（影响新开仓保证金）
 6. ETH/SOL 折价是否在可接受范围
-7. 资金费率变化趋势（大币种是风向标）
+7. 资金费率变化趋势（ETH/SOL 是风向标）
             </div>
 
         </section>
@@ -502,118 +509,132 @@ OKSOL 流动性尚可但不超 0.3  <span class="comment"># 折价波动可控</
         <section>
             <h2>3. 251011 黑天鹅事件复盘</h2>
 
-            <h3>事件链</h3>
+            <h3>市场背景</h3>
+            <p>
+                本次黑天鹅事件由多重因素叠加引发。根据事后收集的信息，事件链大致如下：
+            </p>
             <div class="timeline">
                 <div class="timeline-item critical">
-                    <div class="timeline-time">2025.10.11 05:00 (UTC+8)</div>
+                    <div class="timeline-time">2025.10.11 凌晨（UTC+8）</div>
                     <div class="timeline-desc">
-                        <strong>触发：</strong>特朗普关税言论 → ETH 短时间内暴跌 16%
+                        <strong>触发：</strong>外部新闻驱动，ETH 短时间内大幅下跌。
                     </div>
                 </div>
                 <div class="timeline-item critical">
                     <div class="timeline-time">紧接着</div>
                     <div class="timeline-desc">
-                        <strong>传导：</strong>ETH 暴跌动摇 USDe 协议根基（ETH 现货 + 合约空头组合）。
-                        USDe 作为抵押品的价值下降 → 某大型机构爆仓 →
-                        清算系统自动抛售 USDe 偿还债务 → USDe 脱锚
+                        <strong>传导：</strong>USDe 出现脱锚，使用 USDe 作为抵押品的大型机构爆仓，
+                        清算系统抛售 USDe 偿还债务，进一步加剧脱锚。
                     </div>
                 </div>
                 <div class="timeline-item critical">
                     <div class="timeline-time">随后</div>
                     <div class="timeline-desc">
-                        <strong>清算螺旋：</strong>USDe 脱锚加剧 → 做市商爆仓 → 市场崩溃。
-                        数百亿美元清算规模，循环贷将敞口放大数倍。
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-time">10.11 凌晨（事件发生后）</div>
-                    <div class="timeline-desc">
-                        <strong>应急响应：</strong>立即用 SOL 现货借贷形式把 SOL 币本位和 U 本位合约全部出清，
-                        同时发起 OKSOL→SOL 赎回。最快一批 5 天后到账。
+                        <strong>清算螺旋：</strong>脱锚加剧 → 做市商爆仓 → 市场恐慌蔓延。
+                        大量机构做市商和套利者的对冲仓位被卷入清算。
                     </div>
                 </div>
             </div>
 
-            <h3>应急决策与执行</h3>
+            <div class="img-placeholder">
+                [ 图 1：USDe 脱锚 — 当日 USDe/USDT 汇率走势 ]
+                <br>图片路径：pictures/reports/usde-depeg.webp
+            </div>
+
+            <h3>我们的账户：质押品脱锚 → 强平</h3>
             <p>
-                凌晨 5 点行情发生后，需要在极短时间内对十几个账户做出决策。
-                核心原则是：<strong>先保住能保的，再收拾残局。</strong>
+                在事件之前，我们的套利结构是经典的双腿对冲：做空永续合约（空头腿），
+                同时向交易所借 SOL 和 ETH（多头腿），为了充分利用闲置资产，
+                将借来的 SOL 和 ETH 质押成了 BNSOL 和 WBETH 以获取额外的质押收益。
+            </p>
+            <p>
+                当市场恐慌蔓延，<strong>BNSOL/SOL 和 WBETH/ETH 也出现了脱锚</strong>。
+                我们质押的 BNSOL 和 WBETH 价值缩水，导致质押品总价值低于借贷应还价值。
+                交易所随即启动强制平仓：<strong>在极低的价格将我们的 BNSOL 和 WBETH 卖出</strong>，用于偿还借贷。
             </p>
 
+            <div class="img-placeholder">
+                [ 图 2：BNSOL/SOL 脱锚 — 当日 BNSOL 对 SOL 汇率走势 ]
+                <br>图片路径：pictures/reports/bnsol-depeg.webp
+            </div>
+
+            <div class="img-placeholder">
+                [ 图 3：WBETH/ETH 脱锚 — 当日 WBETH 对 ETH 汇率走势 ]
+                <br>图片路径：pictures/reports/wbeth-depeg.webp
+            </div>
+
+            <p>
+                <strong>这就是亏损的根本原因：</strong>现货多头腿（质押品）在最低点被强制卖出，
+                而空头合约腿仍在。哪怕后来脱锚恢复、价格回升，多头仓位已经没了，
+                账户只剩裸露的空头合约，不再方向中性。最终多个账户净值腰斩。
+            </p>
+
+            <div class="callout warn">
+                <strong>关键教训：</strong>Wrapped asset 的质押收益看似是免费的午餐，但实际上是用流动性换来的。
+                在极端行情中，质押品脱锚叠加借贷偿还压力，会让你在最差的价位被迫离场。
+                这不是方向判断失误，而是<strong>流动性风险 + 杠杆结构的结构性脆弱</strong>。
+            </div>
+
+            <h3>应急响应</h3>
+            <p>
+                事件发生后，核心任务是尽快清理剩余的 SOL 相关仓位，尽可能保住 OKSOL 的赎回渠道。
+            </p>
             <div class="terminal">
 <span class="comment"># 第一批应急操作（10.11 凌晨）</span>
-<span class="warn">→ 所有账户：现货借贷平掉 SOL-USD-SWAP</span>
+<span class="comment"># 所有账户：现货借贷平掉 SOL 合约仓位</span>
+<span class="comment"># 账户均以本位类型标注，真实名称已匿名化</span>
 
-Ibk250812okxeth1    close SOL-USD-SWAP  209,110 张
-Ibk250812okxeth2    close SOL-USD-SWAP   53,320 张
-Ibk250812okxeth3    close SOL-USD-SWAP   83,710 张
-mia250924okxbtc     close SOL-USD-SWAP    7,300 张
-mpars250219okxusdt1 close SOL-USD-SWAP      650 张
-mpars250219okxusdt2 close SOL-USD-SWAP    2,520 张
-mpars250219okxusdt3 close SOL-USD-SWAP    3,970 张
-mpars250219okxusdt4 close SOL-USD-SWAP    1,240 张 + SOL-USDT-SWAP 52,260 张
-mpbtc250912okxbtc1  close SOL-USD-SWAP  297,250 张
-mpmna241107okxusdt1 close SOL-USD-SWAP      480 张
-mpmna241107okxusdt2 close SOL-USD-SWAP      400 张 + SOL-USDT-SWAP 96,605 张
-mpmna241107okxusdt3 close SOL-USD-SWAP      880 张
+ETH本位账户-A    close SOL-USD-SWAP  约 209,000 张
+ETH本位账户-B    close SOL-USD-SWAP   约 53,000 张
+ETH本位账户-C    close SOL-USD-SWAP   约 84,000 张
+BTC本位账户-A    close SOL-USD-SWAP    约 7,300 张
+USDT本位账户-A   close SOL-USD-SWAP      650 张
+USDT本位账户-B   close SOL-USD-SWAP    2,520 张
+USDT本位账户-C   close SOL-USD-SWAP    3,970 张
+USDT本位账户-D   close SOL-USD-SWAP    1,240 张 + SOL-USDT-SWAP 约 52,000 张
+BTC本位账户-B    close SOL-USD-SWAP  约 297,000 张
+USDT本位账户-E   close SOL-USD-SWAP      480 张
+USDT本位账户-F   close SOL-USD-SWAP      400 张 + SOL-USDT-SWAP 约 97,000 张
+USDT本位账户-G   close SOL-USD-SWAP      880 张
 
-<span class="comment"># 清完合约后立即赎回 OKSOL（每日限额 240 SOL/账户）</span>
-<span class="comment"># 第一批赎回 2000 SOL + 1400 SOL</span>
+<span class="comment"># 清完合约后立即申请 OKSOL 赎回（每日限额 240 SOL/账户）</span>
+<span class="comment"># 第一批申请赎回 2,000 SOL + 1,400 SOL</span>
             </div>
 
             <div class="callout warn">
-                <strong>关键决策点：</strong>为什么先清 SOL 而不是 ETH？因为 OKSOL 有赎回渠道（每日 240 SOL 即时赎回），
-                而 BETH 赎回周期长达 56 天，且折价流动性极差。SOL 可以"止血"，ETH 只能"慢慢熬"。
-                这个优先级判断在事后被证明是正确的。
+                <strong>决策优先级：</strong>先清 SOL 而不是 ETH。因为 OKSOL 有赎回渠道（每日 240 SOL 即时赎回），
+                而 BETH 赎回周期长达 56 天，且折价流动性极差。
+                SOL 可以"止血"，ETH 只能"慢慢熬"。这个判断在事后被证明是正确的。
             </div>
 
             <h3>结果统计</h3>
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>账户类别</th>
-                        <th>数量</th>
+                        <th>账户类别（按本位）</th>
+                        <th>大致数量</th>
                         <th>结果</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>腰斩账户</td>
-                        <td class="num">10</td>
-                        <td>净值大幅下跌，部分因循环贷放大敞口</td>
+                        <td>ETH本位账户</td>
+                        <td class="num">多个</td>
+                        <td>净值大幅下跌，个别账户亏损约 140 ETH</td>
                     </tr>
                     <tr>
-                        <td>Payment 账户</td>
-                        <td class="num">5</td>
-                        <td>触发强平或被迫清仓</td>
+                        <td>USDT本位账户</td>
+                        <td class="num">多个</td>
+                        <td>部分触发强平或自动减仓</td>
                     </tr>
                     <tr>
-                        <td>小幅盈利</td>
-                        <td class="num">1</td>
-                        <td>配置较轻、对冲及时的账户</td>
+                        <td>BTC本位账户</td>
+                        <td class="num">少数</td>
+                        <td>配置较轻的账户损失相对可控</td>
                     </tr>
                 </tbody>
             </table>
-
-            <p>
-                Ibk250812okxeth1 账户净值从 ~340 ETH 降至 ~200 ETH，亏损约 140 ETH（约 60W U）。
-                mpars 系列总净值事后统计约 258W U，较事件前有明显回撤。
-            </p>
-
-            <h3>谁赚钱了？</h3>
-            <p>
-                在黑天鹅中盈利的是：流动性提供者金库（HLP）、对手盘 / 清算机制一侧的空头、
-                以及接刀子者 / 回归套利者。我们作为资费套利方，本质上是"卖保险"的角色——
-                平时赚保费，极端行情赔大钱。这是策略的固有属性。
-            </p>
-
-            <div class="callout">
-                <strong>历史不会简单重复，但韵脚相似：</strong>LUNA 事件的影子在这次危机中清晰可见。
-                USDe 的"稳定币理财"叙事掩盖了循环贷放大敞口的事实。
-                许多投资者直到爆仓那一刻，才意识到自己所谓的"稳定币理财"实际上是一场高杠杆的赌博。
-                我们的账户因为杠杆控制相对保守（multiple ~0.6），虽然在 SOL 端及时止血，
-                但 ETH 端的 BETH 流动性陷阱仍然造成了可观损失。
-            </div>
+            <p class="muted">* 具体账户数量和亏损数字已做模糊化处理，以保护客户隐私。</p>
 
         </section>
 
@@ -624,37 +645,31 @@ mpmna241107okxusdt3 close SOL-USD-SWAP      880 张
             <h3>SOL 端：赎回与折价出仓</h3>
             <p>
                 事件后 OKSOL 折价一度达到千 12，但随后快速恢复到千 2 以内。
-                我们在折价回到千 2 以内时逐步出清剩余 SOL 仓位，折价损失可控。
+                在折价回到千 2 以内时逐步出清剩余 SOL 仓位，折价损失可控。
+                后来 OKSOL 折价进一步收窄至万 4-万 5，此时直接卖出比赎回（需付万 7.5 借贷费）更划算。
             </p>
-            <div class="terminal">
-<span class="comment"># OKSOL 折价千 2 出仓损失估算</span>
-Ibk250812okxeth1:  209,110 × 0.002 = <span class="warn">418.22 U</span>
-Ibk250812okxeth2:   53,320 × 0.002 = <span class="warn">106.64 U</span>
-Ibk250812okxeth3:   83,710 × 0.002 = <span class="warn">167.42 U</span>
-mpbtc250912okxbtc1: 297,250 × 0.002 = <span class="warn">594.50 U</span>
-            </div>
-            <p class="muted">* 后来 OKSOL 折价进一步收窄至万 4-万 5，直接卖出比赎回（需付万 7.5 借贷费）更划算。</p>
 
             <h3>ETH 端：BETH 流动性困境</h3>
             <p>
-                ETH 仓位是这次事件中最难处理的部分。BETH 流动性极差，折价在千 4-千 5 之间徘徊，
-                赎回排队长达 56 天，每日赎回额度仅 100 ETH（约 40W U）。
+                ETH 仓位是最难处理的部分。BETH 流动性极差，折价在千 4-千 5 之间徘徊，
+                赎回排队长达 56 天，每日赎回额度仅 100 ETH。
             </p>
             <div class="callout warn">
                 <strong>核心困境：</strong>BETH 折价太高 → 折价出仓实亏太大 → 等赎回 →
                 赎回额度有限且周期长 → 期间费率可能变负 → 持仓成本持续累积。
-                这是一个典型的"流动性陷阱"——你想走，但走不了；你等，但等待有成本。
+                这是一个"流动性陷阱"——想走走不掉，等待有成本。
             </div>
             <p>
-                最终策略是分优先级处理：保证金紧张的账户（mpars 系列、mpmna 系列）优先折价出仓，
-                保证金充裕的账户（Ibk 系列）等待赎回或折价回归。同时利用借币平仓来降低费率风险——
-                借币利率每天 0.68bp，BETH 收益每天 0.696bp，基本打平。
+                最终策略是分优先级处理：保证金紧张的账户（USDT本位账户组）优先折价出仓，
+                保证金充裕的账户（ETH本位账户组）等待赎回或折价回归。
+                同时利用借币平仓来降低费率风险——借币利率每天约 0.68bp，BETH 收益每天约 0.696bp，
+                基本打平，不亏小赚。
             </p>
 
-            <h3>WIF、XPL 等小币种清仓</h3>
+            <h3>小币种清仓</h3>
             <p>
                 黑天鹅后，一些小币种的资金费率持续恶化。全部账户的 WIF-USDT-SWAP 被清仓，
-                XPL 也被砍掉。这些品种在正常行情下贡献收益，但在极端行情中流动性不足、折价波动大，
+                XPL 等也被移除。这些品种在正常行情下贡献收益，但在极端行情中流动性不足、折价波动大，
                 反而成为负担。
             </p>
 
@@ -666,7 +681,7 @@ mpbtc250912okxbtc1: 297,250 × 0.002 = <span class="warn">594.50 U</span>
 
             <h3>5.1 折价出仓的优先级决策</h3>
             <p>
-                当多个账户都需要减仓时，优先级的判断维度是：
+                当多个账户都需要减仓时，优先级排序：
             </p>
             <div class="terminal">
 <span class="comment"># 减仓优先级排序</span>
@@ -680,18 +695,17 @@ mpbtc250912okxbtc1: 297,250 × 0.002 = <span class="warn">594.50 U</span>
             <p>
                 OKX 的赎回规则：即时赎回有每日限额，取个人固定额度和平台动态额度中较小者。
                 超出部分进入链上排队，约 56 天。个人固定额度：ETH 100 枚、SOL 240 枚。
-                在实际操作中，我们发现上午 11:00 左右赎回的 SOL 到账最快，
-                这可能与平台每日额度重置时间有关。
+                实际操作中发现上午 11:00 左右赎回的 SOL 到账最快，可能与平台每日额度重置时间有关。
             </p>
 
             <h3>5.3 散口问题</h3>
             <p>
-                散口（unhedged exposure）是净值波动的隐藏来源。出现散口的常见原因：
+                散口（unhedged exposure）是净值波动的隐藏来源。常见原因：
             </p>
             <ul style="list-style: none; padding-left: 0; margin: 1rem 0;">
                 <li style="padding-left: 1.5rem; position: relative; margin-bottom: 0.5rem; font-size: 0.88rem; color: var(--muted);">
                     <span style="position: absolute; left: 0; color: #555;">—</span>
-                    借币平仓后，还剩一些币本位合约盈利的 SOL，没有自动换回本位币
+                    借币平仓后，币本位合约盈利的 SOL 未自动换回本位币
                 </li>
                 <li style="padding-left: 1.5rem; position: relative; margin-bottom: 0.5rem; font-size: 0.88rem; color: var(--muted);">
                     <span style="position: absolute; left: 0; color: #555;">—</span>
@@ -709,26 +723,23 @@ mpbtc250912okxbtc1: 297,250 × 0.002 = <span class="warn">594.50 U</span>
 
             <h3>5.4 借贷利率 vs 折价损失</h3>
             <p>
-                在 ETH 仓位处理中，面临一个关键权衡：是折价千 5 出 BETH（实亏 0.5%），
-                还是借币平仓支付每天 0.68bp（年化 ~2.5%）？如果折价能在几天内回归，
-                等是划算的；但如果折价持续数周不回归，借币平仓反而是更好的选择。
+                在 ETH 仓位处理中面临一个关键权衡：是折价千 5 出 BETH（实亏 0.5%），
+                还是借币平仓支付每天 0.68bp？如果折价能在几天内回归，等是划算的；
+                如果折价持续数周不回归，借币平仓反而是更好的选择。
                 <strong>核心是判断折价回归的时间预期。</strong>
             </p>
 
             <h3>5.5 大仓位对市场的自我影响</h3>
             <p>
-                在调仓过程中，我们观察到一个现象：当我们大仓位参与进去后，
-                该币种的资金费率表现会变差；当减轻仓位后，费率表现会好转。
-                这说明我们的仓位本身对市场有影响。估算仓位规模对资金费率的弹性，
-                是一个值得深入研究的方向。
+                调仓过程中观察到一个现象：大仓位参与进去后，该币种的资金费率表现会变差；
+                减仓后费率表现会好转。估算仓位规模对资金费率的弹性，是一个值得深入研究的方向。
             </p>
 
             <h3>5.6 实盘测试优于复杂计算</h3>
             <p>
-                很多问题放在纸面上需要大量建模和计算，但用测试账户直接操作会很快清晰。
+                很多问题放在纸面上需要大量建模和计算，但用测试账户直接操作很快就清晰了。
                 例如：OKB 质押后能否作为保证金？买入 OKB 对现有仓位 MMR 的影响？
-                U 本位转币本位的保证金变化？这些规则细节，与其看文档推演，
-                不如直接测试——<strong>一测试就什么都清楚了。</strong>
+                <strong>与其复杂地计算半天还不一定对，不如直接测试——一测试就什么都清楚了。</strong>
             </p>
 
             <h3>5.7 其他经验点</h3>
@@ -751,7 +762,7 @@ mpbtc250912okxbtc1: 297,250 × 0.002 = <span class="warn">594.50 U</span>
                 </li>
                 <li style="padding-left: 1.5rem; position: relative; font-size: 0.88rem;">
                     <span style="position: absolute; left: 0; color: #555;">—</span>
-                    ETH/SOL 是风向标——一般行情不好都是从 discount 比较高的大币开始的。
+                    ETH/SOL 是风向标——行情不好通常从 discount 比较高的大币开始。
                 </li>
             </ul>
 
@@ -764,22 +775,21 @@ mpbtc250912okxbtc1: 297,250 × 0.002 = <span class="warn">594.50 U</span>
             <h3>关于策略本质</h3>
             <p>
                 资金费率套利本质上是<strong>卖保险</strong>——平时稳定赚保费，
-                极端行情赔大钱。这不是一个"无风险套利"策略，而是一个"赚小钱、亏大钱"的策略。
-                理解这一点，才能正确看待收益和风险的关系。
+                极端行情赔大钱。理解这一点，才能正确看待收益和风险的关系。
             </p>
 
-            <h3>关于杠杆</h3>
+            <h3>关于杠杆与结构性脆弱</h3>
             <p>
-                循环贷（借币再质押再借币）将敞口放大数倍。许多人在爆仓时才意识到自己不是在理财，
-                而是在赌博。我们在实操中把 multiple 控制在 0.6-0.8，这在正常行情下显得保守，
-                但在黑天鹅中保住了底线。<strong>杠杆不是收益的放大器，而是生存概率的除数。</strong>
+                这次亏损的根本原因不是方向判断失误，而是<strong>质押品脱锚 + 借贷结构</strong>造成的结构性脆弱。
+                借币买入现货 → 质押成 wrapped asset → 质押品脱锚 → 价值缩水 → 强制平仓。
+                这个链条在正常行情下运转良好（吃费率 + 质押收益），但在极端行情中每一步都是致命的。
             </p>
 
             <h3>关于流动性</h3>
             <p>
                 BETH 的流动性困境是这次事件中最大的教训。Wrapped asset 的折价套利收益看起来很美好，
-                但流动性差的品种在极端行情中会让你的仓位变成"死仓"——既卖不掉，也赎不回，
-                只能眼睁睁看着净值被侵蚀。<strong>流动性是黑天鹅中最稀缺的资源。</strong>
+                但流动性差的品种在极端行情中会让仓位变成"死仓"——既卖不掉，也赎不回。
+                <strong>流动性是黑天鹅中最稀缺的资源。</strong>
             </p>
 
             <h3>关于人 vs 系统</h3>
@@ -791,10 +801,9 @@ mpbtc250912okxbtc1: 297,250 × 0.002 = <span class="warn">594.50 U</span>
 
             <h3>关于坦诚</h3>
             <p>
-                这份报告记录了真实的亏损和失误。10 个账户腰斩、BETH 流动性陷阱、
+                这份报告记录了真实的亏损和失误：质押品脱锚被强平、BETH 流动性陷阱、
                 散口未及时处理导致的额外损失——这些都是花钱买来的教训。
-                坦诚面对亏损，比粉饰结果更有价值。正如网站上写的：
-                <strong>真正的树，而不是精致的塑料盆景。</strong>
+                坦诚面对亏损，比粉饰结果更有价值。<strong>真正的树，而不是精致的塑料盆景。</strong>
             </p>
 
             <div class="callout">
@@ -806,7 +815,7 @@ mpbtc250912okxbtc1: 297,250 × 0.002 = <span class="warn">594.50 U</span>
 
         </section>
 
-        <!-- 7. 技术栈与工具 -->
+        <!-- 7. 技术栈 -->
         <section>
             <h2>7. 技术栈与工具</h2>
             <table class="data-table">
@@ -823,7 +832,7 @@ mpbtc250912okxbtc1: 297,250 × 0.002 = <span class="warn">594.50 U</span>
                     <tr><td>OKX API</td><td>账户操作、赎回、资金划转</td></tr>
                     <tr><td>Bybit API</td><td>跨交易所套利执行</td></tr>
                     <tr><td>Binance API</td><td>子账户只读监控</td></tr>
-                    <tr><td>Cursor</td><td>可视化页面开发 ($20/月)</td></tr>
+                    <tr><td>Cursor</td><td>可视化页面开发</td></tr>
                 </tbody>
             </table>
         </section>
