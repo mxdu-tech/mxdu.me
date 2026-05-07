@@ -40,6 +40,30 @@
       margin-bottom: 2rem;
     }
 
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .header-main {
+      flex: 1;
+    }
+
+    .qr-code {
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 500px) {
+      .qr-code {
+        width: 64px;
+        height: 64px;
+      }
+    }
+
     h1 {
       font-size: 1.6rem;
       font-weight: 700;
@@ -157,12 +181,18 @@
 <body>
 
   <header>
-    <h1>M.X Du</h1>
-    <p class="tagline">AI Native Builder — Web3 & AI</p>
-    <div class="links">
-      <a href="https://mxdu.me">mxdu.me</a>
-      <a href="https://github.com/mxdu-tech">github.com/mxdu-tech</a>
-      <span>mxdev.work@gmail.com</span>
+    <div class="header-inner">
+      <div class="header-main">
+        <h1>M.X Du</h1>
+        <p class="tagline">AI Native Builder — Web3 & AI</p>
+        <div class="links">
+          <a href="https://mxdu.me">mxdu.me</a>
+          <a href="https://github.com/mxdu-tech">github.com/mxdu-tech</a>
+          <span>mxdev.work@gmail.com</span>
+        </div>
+      </div>
+  
+      <img class="qr-code" src="qr-code.png" alt="Scan to visit mxdu.me">
     </div>
   </header>
 
@@ -206,25 +236,10 @@
     <p>Actively tracking options strategies and funding rate arbitrage. Private code; results available upon discussion.</p>
   </section>
 
-  <!-- Experience -->
   <section>
-    <h2>Experience</h2>
-
-    <div class="experience-item">
-      <div class="exp-header">
-        <span class="exp-title">Algorithm Engineer Intern — Major Tech Company</span>
-        <span class="exp-date">Graduate Period</span>
-      </div>
-      <p class="exp-desc">Applied LLMs to video semantic search. Delivered features that shipped to production.</p>
-    </div>
-
-    <div class="experience-item">
-      <div class="exp-header">
-        <span class="exp-title">Master's in Computer Science (NLP / AI)</span>
-        <span class="exp-date">Graduated</span>
-      </div>
-      <p class="exp-desc">3 published papers. Research focus on NLP and language model applications.</p>
-    </div>
+    <h2>Foundation</h2>
+    <p>M.S. Software Engineering (NLP / AI), National University of Defense Technology, 2023. B.S. Software Engineering, Northwest A&F University, 2020.</p>
+    <p>3 published papers. Applied LLMs to video semantic search at a major tech company — shipped.</p>
   </section>
 
 </body>
