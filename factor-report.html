@@ -72,10 +72,10 @@
 <p class="subtitle">加密货币截面多空因子 · 建模框架 · 工程实践记录</p>
 
 <p>本报告记录了我在加密货币量化策略研发领域的系统性工作，核心涵盖<strong>策略研发管线搭建、多套建模框架实现、因子显著性评估体系构建，以及一系列工程实践问题的排查与解决</strong>。</p>
-<p>报告重点展示三方面能力：</p>
-<p><strong>建模框架多样性</strong>——从LightGBM截面多目标回归、单标的时间序列预测，到基于遗传规划的非线性因子挖掘，三套框架覆盖了量化因子研发的主要技术路线。</p>
-<p><strong>因子评估严谨性</strong>——建立了包含Rank IC/IR、Quantile Spread、回归分析、相关性矩阵在内的完整评估体系，确保每个因子的有效性可量化、可对比。</p>
-<p><strong>工程落地能力</strong>——从数据清洗、特征工程、中性化处理到回测引擎和实盘部署，独立走通了从研究到生产的全链路。在实盘与回测出现偏差时，深入到订单簿（Order Book）级别进行微观结构分析，积累了宝贵的实践经验。</p>
+<p>报告重点展示三方面工作：</p>
+<p><strong>建模框架</strong>——从LightGBM截面多目标回归、单标的时间序列预测，到基于遗传规划的非线性因子挖掘，三套框架覆盖了量化因子研发的主要技术路线。</p>
+<p><strong>因子评估</strong>——建立了包含Rank IC/IR、Quantile Spread、回归分析、相关性矩阵在内的完整评估体系，确保每个因子的有效性可量化、可对比。</p>
+<p><strong>工程落地</strong>——从数据清洗、特征工程、中性化处理到回测引擎和实盘部署，独立走通了从研究到生产的全链路。在实盘与回测出现偏差时，深入到订单簿（Order Book）级别进行微观结构分析。</p>
 
 <div class="back-to-top"><a href="#nav">↑ 返回顶部</a></div>
 
@@ -187,7 +187,7 @@
 
 <div class="img-placeholder">
   <p><strong>📌 图1：回测PNL曲线图</strong></p>
-  <p><!-- 替换为：<img src="pictures/report/backtest_pnl.png" alt="回测PNL曲线"> --></p>
+  <p><img src="pictures/report/backtest_pnl。webp" alt="回测PNL曲线"> </p>
 </div>
 
 <h3>4.2 多时间尺度预测能力</h3>
@@ -220,25 +220,24 @@
 
 <div class="img-placeholder">
   <p><strong>📌 图2：因子相关性热力图</strong></p>
-  <p><!-- 替换为：<img src="pictures/report/factor_correlation_matrix.png" alt="因子相关性热力图"> --></p>
+  <p><img src="pictures/report/factor_correlation_matrix。webp" alt="因子相关性热力图"> </p>
 </div>
 
 <div class="img-placeholder">
   <p><strong>📌 图3：所有因子的显著性表现汇总表</strong></p>
-  <p><!-- 替换为：<img src="pictures/report/factor_significance_summary.png" alt="因子显著性汇总表"> --></p>
+  <p> <img src="pictures/report/factor_significance_summary。webp" alt="因子显著性汇总表"> </p>
 </div>
 
 <div class="img-placeholder">
   <p><strong>📌 图4：Quantile Spread时序图</strong></p>
-  <p><!-- 替换为：<img src="pictures/report/quantile_spread_time_series.png" alt="Quantile Spread时序图"> --></p>
+  <p><img src="pictures/report/quantile_spread_time_series。webp" alt="Quantile Spread时序图"> </p>
 </div>
 
 <div class="back-to-top"><a href="#nav">↑ 返回顶部</a></div>
 
 <!-- ===== 5. 工程实践经验 ===== -->
 <h2 id="engineering">5. 工程实践经验</h2>
-<p>在策略研发过程中，遇到并解决了若干具有代表性的技术问题。这些经验体现了独立排查和解决复杂工程问题的能力，也是策略从研究走向实盘过程中不可或缺的积累。</p>
-
+<p>在策略研发过程中，遇到并解决了若干具有代表性的技术问题。
 <h3>5.1 修复Ta-Lib中EMA函数的深层Bug</h3>
 <p><strong>问题</strong>：生产环境和本地环境运行同一模型，因子值存在微小差异，导致backtest与live forecast对不上。</p>
 <p><strong>排查</strong>：通过逐层对比feature数据，发现使用了EMA计算的技术指标（如RSI、MACD）在不同时间序列长度下会产生不同结果。EMA的递归计算依赖初始值，而Ta-Lib的实现在不同输入长度下采用了不同的初始化策略。这不是配置问题，而是库本身的实现不一致。</p>
@@ -284,7 +283,7 @@
 
 <div class="img-placeholder">
   <p><strong>📌 图5：实盘vs回测偏差分析图 / 订单簿偏移量分布图</strong></p>
-  <p><!-- 替换为：<img src="pictures/report/market_microstructure_analysis.png" alt="实盘偏差分析"> --></p>
+  <p><img src="pictures/report/market_microstructure_analysis。webp" alt="实盘偏差分析"> </p>
 </div>
 
 <div class="back-to-top"><a href="#nav">↑ 返回顶部</a></div>
