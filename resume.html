@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume — M.X Du</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --text: #1A1A1A;
+      --muted: #555;
+      --divider: #DDD;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      line-height: 1.6;
+      background: #fff;
+      padding: 3rem 2rem;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        padding: 0;
+        max-width: 100%;
+        font-size: 11pt;
+      }
+      @page {
+        margin: 1.8cm 2cm;
+      }
+    }
+
+    header {
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+
+    .tagline {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .links a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid var(--muted);
+    }
+
+    .links span {
+      color: var(--muted);
+    }
+
+    section {
+      margin-bottom: 1.8rem;
+    }
+
+    h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--divider);
+      padding-bottom: 0.3rem;
+      margin-bottom: 1rem;
+    }
+
+    .project {
+      margin-bottom: 1.2rem;
+    }
+
+    .project-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .project-links {
+      font-size: 0.85rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .project-links a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--divider);
+      margin-right: 1rem;
+    }
+
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .project-ai {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .experience-item {
+      margin-bottom: 0.8rem;
+    }
+
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+
+    .exp-title {
+      font-weight: 600;
+    }
+
+    .exp-date {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .exp-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    @media (max-width: 500px) {
+      body { padding: 1.5rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>M.X Du</h1>
+    <p class="tagline">AI Native Builder — Web3 & AI</p>
+    <div class="links">
+      <a href="https://mxdu.me">mxdu.me</a>
+      <a href="https://github.com/mxdu-tech">github.com/mxdu-tech</a>
+      <span>mxdev.work@gmail.com</span>
+    </div>
+  </header>
+
+  <!-- Selected Work -->
+  <section>
+    <h2>Selected Work</h2>
+
+    <div class="project">
+      <p class="project-name">DeFi Portfolio Agent</p>
+      <p class="project-links">
+        <a href="https://portfolio-agent.defi.mxdu.me">Live Demo</a>
+        <a href="https://github.com/mxdu-tech/defi-portfolio-agent">GitHub</a>
+      </p>
+      <p class="project-desc">AI agent monitoring Aave positions with human-in-the-loop transaction design. Built with LangGraph + Claude + Web3.py.</p>
+      <p class="project-ai">AI Role: Workflow orchestration, Claude-driven decision logic, and human-in-the-loop confirmation.</p>
+    </div>
+
+    <div class="project">
+      <p class="project-name">Aerodrome AI Launchpad</p>
+      <p class="project-links">
+        <a href="https://launchpad.defi.mxdu.me">Live Demo</a>
+        <a href="https://github.com/mxdu-tech/aerodrome-ai-launchpad">GitHub</a>
+      </p>
+      <p class="project-desc">AI-powered launch flow for ERC20 tokens and liquidity bootstrapping on Aerodrome. One guided flow from idea to on-chain.</p>
+      <p class="project-ai">AI Role: AI-assisted contract generation and liquidity pool configuration.</p>
+    </div>
+
+    <div class="project">
+      <p class="project-name">Voice Wallet</p>
+      <p class="project-links">
+        <a href="https://github.com/mxdu-tech/voice-wallet">GitHub</a>
+      </p>
+      <p class="project-desc">"Speak to Pay." Self-custodial browser wallet using natural language for EVM transactions. An experiment in human-centric Web3 UX.</p>
+      <p class="project-ai">AI Role: Natural language intent parsing and transaction parameter extraction.</p>
+    </div>
+  </section>
+
+  <!-- Quantitative Strategies -->
+  <section>
+    <h2>Quantitative Strategies</h2>
+    <p>Actively tracking options strategies and funding rate arbitrage. Private code; results available upon discussion.</p>
+  </section>
+
+  <!-- Experience -->
+  <section>
+    <h2>Experience</h2>
+
+    <div class="experience-item">
+      <div class="exp-header">
+        <span class="exp-title">Algorithm Engineer Intern — Major Tech Company</span>
+        <span class="exp-date">Graduate Period</span>
+      </div>
+      <p class="exp-desc">Applied LLMs to video semantic search. Delivered features that shipped to production.</p>
+    </div>
+
+    <div class="experience-item">
+      <div class="exp-header">
+        <span class="exp-title">Master's in Computer Science (NLP / AI)</span>
+        <span class="exp-date">Graduated</span>
+      </div>
+      <p class="exp-desc">3 published papers. Research focus on NLP and language model applications.</p>
+    </div>
+  </section>
+
+</body>
+</html>
