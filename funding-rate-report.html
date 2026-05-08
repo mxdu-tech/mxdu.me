@@ -577,35 +577,32 @@ OKSOL 流动性尚可但不超 0.3  <span class="comment"># 折价波动可控</
 
             <h3>应急响应</h3>
             <p>
-                事件发生后，核心任务是尽快清理剩余的 SOL 相关仓位，尽可能保住 OKSOL 的赎回渠道。
+                事件发生后，最优先的事项是<strong>先砍掉空头合约腿</strong>。因为现货多头已被强平，
+                账户不再方向中性。如果不立刻平掉空头合约，裸露的空头仓位会在后续反弹中造成更大亏损。
+                先砍腿以消除方向性敞口，是应急第一步。
             </p>
-            <div class="terminal">
-                <span class="comment"># 第一批应急操作（10.11 凌晨）</span>
-                <span class="comment"># 所有账户：现货借贷平掉 SOL 合约仓位</span>
-                <span class="comment"># 账户均以本位类型标注，真实名称已匿名化</span>
-
-                ETH本位账户-A    close SOL-USD-SWAP  约 209,000 张
-                ETH本位账户-B    close SOL-USD-SWAP   约 53,000 张
-                ETH本位账户-C    close SOL-USD-SWAP   约 84,000 张
-                BTC本位账户-A    close SOL-USD-SWAP    约 7,300 张
-                USDT本位账户-A   close SOL-USD-SWAP      650 张
-                USDT本位账户-B   close SOL-USD-SWAP    2,520 张
-                USDT本位账户-C   close SOL-USD-SWAP    3,970 张
-                USDT本位账户-D   close SOL-USD-SWAP    1,240 张 + SOL-USDT-SWAP 约 52,000 张
-                BTC本位账户-B    close SOL-USD-SWAP  约 297,000 张
-                USDT本位账户-E   close SOL-USD-SWAP      480 张
-                USDT本位账户-F   close SOL-USD-SWAP      400 张 + SOL-USDT-SWAP 约 97,000 张
-                USDT本位账户-G   close SOL-USD-SWAP      880 张
-
-                <span class="comment"># 清完合约后立即申请 OKSOL 赎回（每日限额 240 SOL/账户）</span>
-                <span class="comment"># 第一批申请赎回 2,000 SOL + 1,400 SOL</span>
-            </div>
-
-            <div class="callout warn">
-                <strong>决策优先级：</strong>先清 SOL 而不是 ETH。因为 OKSOL 有赎回渠道（每日 240 SOL 即时赎回），
-                而 BETH 赎回周期长达 56 天，且折价流动性极差。
-                SOL 可以"止血"，ETH 只能"慢慢熬"。这个判断在事后被证明是正确的。
-            </div>
+            <p>
+                砍腿之后，由于此次黑天鹅事件的影响，市场资费开始持续为负，
+                正向套利进入亏损期。我们的大量仓位需要有计划地逐步清仓。
+                但不能一次全部平掉——仓位规模大，一次性清仓会造成严重的净值波动，
+                也需要考虑流动性和滑点问题。必须分批次、按优先级有序进行。
+            </p>
+            <p>
+                清仓的优先级逻辑：<strong>SOL 端优先赎回，WBETH/BETH 端只能折价出。</strong>
+            </p>
+            <p>
+                为什么 SOL 端可以赎？因为 OKSOL 有相对明确的即时赎回渠道——每日固定额度 240 SOL。
+                虽然也有赎回排队，但至少还能等。在折价回到千 2 以内时就可以逐步出清剩余 SOL 仓位，
+                折价损失可控。
+            </p>
+            <p>
+                为什么 WBETH/BETH 只能折价出？因为 BETH 的即时赎回每日额度仅有 100 ETH（约 40W U），
+                而我们的持仓远大于这个规模。排队等待赎回的周期长达 56 天，期间折价可能在千 4-千 5 徘徊，
+                费率也可能持续为负。等不起，只能承担折价损失逐步出仓。
+            </p>
+            <p>
+                这就是 1011 善后处理的核心约束：SOL 可以止血，ETH 只能慢慢熬。
+            </p>
 
             <h3>结果统计</h3>
             <table class="data-table">
