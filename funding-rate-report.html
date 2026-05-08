@@ -536,10 +536,10 @@ OKSOL 流动性尚可但不超 0.3  <span class="comment"># 折价波动可控</
                 </div>
             </div>
 
-            <div class="img-placeholder">
-                [ 图 1：USDe 脱锚 — 当日 USDe/USDT 汇率走势 ]
-                <br>图片路径：pictures/report/usde-depeg.webp
-            </div>
+            <figure style="margin: 1.5rem 0; text-align: center;">
+                <img src="pictures/report/usde-depeg.webp" alt="USDe 脱锚" style="max-width: 100%; border-radius: 6px; border: 1px solid var(--border);">
+                <figcaption style="font-family: var(--font); font-size: 0.72rem; color: var(--muted); margin-top: 0.5rem;">图 1：USDe 脱锚 — 当日 USDe/USDT 汇率走势</figcaption>
+            </figure>
 
             <h3>我们的账户：质押品脱锚 → 强平</h3>
             <p>
@@ -553,15 +553,15 @@ OKSOL 流动性尚可但不超 0.3  <span class="comment"># 折价波动可控</
                 交易所随即启动强制平仓：<strong>在极低的价格将我们的 BNSOL 和 WBETH 卖出</strong>，用于偿还借贷。
             </p>
 
-            <div class="img-placeholder">
-                [ 图 2：BNSOL/SOL 脱锚 — 当日 BNSOL 对 SOL 汇率走势 ]
-                <br>图片路径：pictures/report/bnsol-depeg.webp
-            </div>
+            <figure style="margin: 1.5rem 0; text-align: center;">
+                <img src="pictures/report/bnsol-depeg.webp" alt="BNSOL/SOL 脱锚" style="max-width: 100%; border-radius: 6px; border: 1px solid var(--border);">
+                <figcaption style="font-family: var(--font); font-size: 0.72rem; color: var(--muted); margin-top: 0.5rem;">图 2：BNSOL/SOL 脱锚 — 当日 BNSOL 对 SOL 汇率走势</figcaption>
+            </figure>
 
-            <div class="img-placeholder">
-                [ 图 3：WBETH/ETH 脱锚 — 当日 WBETH 对 ETH 汇率走势 ]
-                <br>图片路径：pictures/report/wbeth-depeg.webp
-            </div>
+            <figure style="margin: 1.5rem 0; text-align: center;">
+                <img src="pictures/report/wbeth-depeg.webp" alt="WBETH/ETH 脱锚" style="max-width: 100%; border-radius: 6px; border: 1px solid var(--border);">
+                <figcaption style="font-family: var(--font); font-size: 0.72rem; color: var(--muted); margin-top: 0.5rem;">图 3：WBETH/ETH 脱锚 — 当日 WBETH 对 ETH 汇率走势</figcaption>
+            </figure>
 
             <p>
                 <strong>这就是亏损的根本原因：</strong>现货多头腿（质押品）在最低点被强制卖出，
@@ -580,25 +580,25 @@ OKSOL 流动性尚可但不超 0.3  <span class="comment"># 折价波动可控</
                 事件发生后，核心任务是尽快清理剩余的 SOL 相关仓位，尽可能保住 OKSOL 的赎回渠道。
             </p>
             <div class="terminal">
-<span class="comment"># 第一批应急操作（10.11 凌晨）</span>
-<span class="comment"># 所有账户：现货借贷平掉 SOL 合约仓位</span>
-<span class="comment"># 账户均以本位类型标注，真实名称已匿名化</span>
+                <span class="comment"># 第一批应急操作（10.11 凌晨）</span>
+                <span class="comment"># 所有账户：现货借贷平掉 SOL 合约仓位</span>
+                <span class="comment"># 账户均以本位类型标注，真实名称已匿名化</span>
 
-ETH本位账户-A    close SOL-USD-SWAP  约 209,000 张
-ETH本位账户-B    close SOL-USD-SWAP   约 53,000 张
-ETH本位账户-C    close SOL-USD-SWAP   约 84,000 张
-BTC本位账户-A    close SOL-USD-SWAP    约 7,300 张
-USDT本位账户-A   close SOL-USD-SWAP      650 张
-USDT本位账户-B   close SOL-USD-SWAP    2,520 张
-USDT本位账户-C   close SOL-USD-SWAP    3,970 张
-USDT本位账户-D   close SOL-USD-SWAP    1,240 张 + SOL-USDT-SWAP 约 52,000 张
-BTC本位账户-B    close SOL-USD-SWAP  约 297,000 张
-USDT本位账户-E   close SOL-USD-SWAP      480 张
-USDT本位账户-F   close SOL-USD-SWAP      400 张 + SOL-USDT-SWAP 约 97,000 张
-USDT本位账户-G   close SOL-USD-SWAP      880 张
+                ETH本位账户-A    close SOL-USD-SWAP  约 209,000 张
+                ETH本位账户-B    close SOL-USD-SWAP   约 53,000 张
+                ETH本位账户-C    close SOL-USD-SWAP   约 84,000 张
+                BTC本位账户-A    close SOL-USD-SWAP    约 7,300 张
+                USDT本位账户-A   close SOL-USD-SWAP      650 张
+                USDT本位账户-B   close SOL-USD-SWAP    2,520 张
+                USDT本位账户-C   close SOL-USD-SWAP    3,970 张
+                USDT本位账户-D   close SOL-USD-SWAP    1,240 张 + SOL-USDT-SWAP 约 52,000 张
+                BTC本位账户-B    close SOL-USD-SWAP  约 297,000 张
+                USDT本位账户-E   close SOL-USD-SWAP      480 张
+                USDT本位账户-F   close SOL-USD-SWAP      400 张 + SOL-USDT-SWAP 约 97,000 张
+                USDT本位账户-G   close SOL-USD-SWAP      880 张
 
-<span class="comment"># 清完合约后立即申请 OKSOL 赎回（每日限额 240 SOL/账户）</span>
-<span class="comment"># 第一批申请赎回 2,000 SOL + 1,400 SOL</span>
+                <span class="comment"># 清完合约后立即申请 OKSOL 赎回（每日限额 240 SOL/账户）</span>
+                <span class="comment"># 第一批申请赎回 2,000 SOL + 1,400 SOL</span>
             </div>
 
             <div class="callout warn">
