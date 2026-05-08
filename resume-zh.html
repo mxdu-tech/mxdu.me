@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>简历 — M.X Du</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --text: #1A1A1A;
+            --muted: #555;
+            --divider: #DDD;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            font-family: var(--font);
+            color: var(--text);
+            line-height: 1.6;
+            background: #fff;
+            padding: 3rem 2rem;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                max-width: 100%;
+                font-size: 11pt;
+            }
+            @page {
+                margin: 1.8cm 2cm;
+            }
+        }
+
+        header {
+            margin-bottom: 2rem;
+        }
+
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .header-main {
+            flex: 1;
+        }
+
+        .qr-code {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 500px) {
+            .qr-code {
+                width: 64px;
+                height: 64px;
+            }
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.3rem;
+        }
+
+        .tagline {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 0.8rem;
+        }
+
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .links a {
+            color: var(--text);
+            text-decoration: none;
+            border-bottom: 1px solid var(--muted);
+        }
+
+        p a {
+            color: var(--text);
+            text-decoration: none;
+            border-bottom: 1px solid var(--muted);
+        }
+
+        .links span {
+            color: var(--muted);
+        }
+
+        section {
+            margin-bottom: 1.8rem;
+        }
+
+        h2 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border-bottom: 1px solid var(--divider);
+            padding-bottom: 0.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .project {
+            margin-bottom: 1.2rem;
+        }
+
+        .project-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .project-links {
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .project-links a {
+            color: var(--muted);
+            text-decoration: none;
+            border-bottom: 1px solid var(--divider);
+            margin-right: 1rem;
+        }
+
+        .project-desc {
+            font-size: 0.9rem;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .project-ai {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.15rem;
+        }
+
+        p {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 500px) {
+            body { padding: 1.5rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <div class="header-main">
+                <h1>M.X Du</h1>
+                <p class="tagline">AI Native Builder — Web3 & AI</p>
+                <div class="links">
+                    <span>TG: @Dudev_work</span>
+                    <a href="https://mxdu.me">mxdu.me</a>
+                    <a href="https://github.com/mxdu-tech">github.com/mxdu-tech</a>
+                    <span>mxdev.work@gmail.com</span>
+                </div>
+            </div>
+
+            <figure style="text-align: center;">
+                <img src="qr-code.png" alt="mxdu.me QR" style="width: 80px; height: 80px;">
+                <figcaption style="font-size: 0.7rem; color: var(--muted);">个人主页</figcaption>
+            </figure>
+        </div>
+    </header>
+
+    <!-- Selected Work -->
+    <section>
+        <h2>项目作品</h2>
+
+        <div class="project">
+            <p class="project-name">DeFi Portfolio Agent</p>
+            <p class="project-links">
+                <a href="https://portfolio-agent.defi.mxdu.me">Live Demo</a>
+                <a href="https://github.com/mxdu-tech/defi-portfolio-agent">GitHub</a>
+            </p>
+            <p class="project-desc">AI 代理，监控 Aave 仓位，人机协同确认交易。基于 LangGraph + Claude + Web3.py 构建。</p>
+            <p class="project-ai">AI 角色：工作流编排、Claude 驱动决策逻辑、人机协同交易确认。</p>
+        </div>
+
+        <div class="project">
+            <p class="project-name">Aerodrome AI Launchpad</p>
+            <p class="project-links">
+                <a href="https://launchpad.defi.mxdu.me">Live Demo</a>
+                <a href="https://github.com/mxdu-tech/aerodrome-ai-launchpad">GitHub</a>
+            </p>
+            <p class="project-desc">AI 驱动的一站式 ERC20 代币发行与流动性引导流程，部署在 Aerodrome（Base 链）。</p>
+            <p class="project-ai">AI 角色：AI 辅助合约生成、流动性池配置、端到端发行流程。</p>
+        </div>
+
+        <div class="project">
+            <p class="project-name">Voice Wallet</p>
+            <p class="project-links">
+                <a href="https://github.com/mxdu-tech/voice-wallet">GitHub</a>
+            </p>
+            <p class="project-desc">"说话即支付"。自托管浏览器钱包，通过自然语言执行 EVM 交易。探索以人为中心的 Web3 交互体验。</p>
+            <p class="project-ai">AI 角色：自然语言意图解析、交易参数提取。</p>
+        </div>
+    </section>
+
+    <!-- Quantitative Strategies -->
+    <section>
+        <h2>量化策略</h2>
+        <p>持续追踪期权策略与资金费率套利。代码私有，结果可讨论。</p>
+        <p>
+            此前搭建完整量化系统——因子挖掘、回测、实盘执行。
+            → <a href="https://mxdu.me/factor-report">因子挖掘技术报告</a>
+        </p>
+        <p>
+            搭建跨交易所资金费率套利监控系统（Sentinel），四层漏斗筛选 + Telegram 推送。基于信号手动跟单 3 笔，全部盈利。
+            → <a href="https://mxdu.me/sentinel-report">Sentinel 项目报告</a>
+        </p>
+        <p>
+            BTC 备兑看涨期权策略手动践行——已结算 10 笔，胜率 100%。
+            → <a href="https://mxdu.me/options-strategy-notes">期权策略实践笔记</a>
+        </p>
+    </section>
+
+    <section>
+        <h2>教育背景</h2>
+        <p>计算机硕士（NLP / AI 方向），国防科技大学，2023。</p>
+        <p>软件工程学士，西北农林科技大学，2020。</p>
+        <p>发表 3 篇学术论文（语义检索方向）。曾于某头部互联网公司应用 LLM 于视频语义搜索，召回率从 62.87% 提升至 87.22%，已上线。</p>
+    </section>
+
+</body>
+</html>
